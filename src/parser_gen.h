@@ -60,7 +60,9 @@ private:
   int token_id_counter=0;
   const std::vector<SyntaxDef> &syntax_rules;
   std::unordered_map<string, std::vector<std::pair<int, SyntaxDef>>> token_def_map;
-  const string start_symbol="main";
+  const string START_SYMBOL="main";
+  const string META_START_SYMBOL="META_START_SYMBOL";
+  const SyntaxDef start_rule(META_START_SYMBOL, std::vector<string>({START_SYMBOL}));
   void init_token_def_map();
 public:
   SyntaxDB(const std::vector<SyntaxDef> &syntax_rules);
@@ -70,7 +72,7 @@ public:
   const std::vector<std::pair<int, SyntaxDef>>& find_rule(const string &token) const;
   int get_token_id(const string &token);
   const SyntaxDef& get_rule(int rule_id) const;
-  int get_rule_id(const SyntaxDef &rule) const;
+  int get_rule_id(const SyntaxDef &rule) const; //return -100 on not-found
 };
 
 class ClosureItem{
@@ -119,4 +121,26 @@ public:
   const string& get_lr0_hash() const { return lr0_hash; }
   const string& get_lr1_hash() const { return lr1_hash; }
   ClosureSet merge(const ClosureSet &cs) const;
+};
+
+class DFA_Node{
+public:
+  ClosureSet cs;
+  std::unordered_map<string, std::weak_ptr<DFA_Node>> edge;
+  DFA_Node(ClosureSet cs, std::unordered_map<string, std::weak_ptr<DFA_Node>> edge=std::unordered_map<string, std::weak_ptr<DFA_Node>>())
+    :cs(cs), edge(edge) {}
+};
+
+class DFA_Generator{
+private:
+  std::shared_ptr<SyntaxDB> db;
+  std::vector<std::shared_ptr<DFA_Node>> lr_dfa, lalr_dfa;
+  std::unordered_map<string, ClosureSet> generate_new_cs(const ClosureSet &cs) const;
+  std::weak_ptr<DFA_Node> search_edge_dest(const std::vector<std::shared_ptr<DFA_Node>> &dfa, const std::shared_ptr<DFA_Node> &node) const;
+  void generate_dfa();
+  void merge_la();
+public:
+  DFA_Generator(std::shared_ptr<SyntaxDB> db);
+  const std::vector<std::shared_ptr<DFA_Node>>& get_lr_dfa() const { return lr_dfa; };
+  const std::vector<std::shared_ptr<DFA_Node>>& get_lalr_dfa() const { return lalr_dfa; };
 };

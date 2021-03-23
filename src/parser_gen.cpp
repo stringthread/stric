@@ -111,6 +111,8 @@ SyntaxDB::SyntaxDB(const std::vector<SyntaxDef> &arg_syntax_rules)
    fs(arg_syntax_rules, sd),
    syntax_rules(arg_syntax_rules)
 {
+  get_token_id(START_SYMBOL); //add to token_id_map
+  get_token_id(META_START_SYMBOL); // add to token_id_map
   init_token_def_map();
 }
 
@@ -130,12 +132,14 @@ const std::vector<std::pair<int, SyntaxDef>>& SyntaxDB::find_rule(const string &
 }
 
 const SyntaxDef& SyntaxDB::get_rule(int rule_id) const {
+  if(rule_id==-1) return start_rule;
   return syntax_rules[rule_id];
 }
 
 int SyntaxDB::get_rule_id(const SyntaxDef &rule) const {
+  if(rule==start_rule) return -1;
   const auto& itr=std::find(syntax_rules.begin(), syntax_rules.end(), rule);
-  if(itr==syntax_rules.end()) return -1;
+  if(itr==syntax_rules.end()) return -100;
   return std::distance(syntax_rules.begin(), itr);
 }
 
@@ -293,9 +297,6 @@ void ClosureSet::expand(){
     }
     first_index.push_back(ci.get_look_aheads().at(0));
     auto look_aheads=db->get_fs().get(first_index);
-    /*std::sort(look_aheads.begin(),look_aheads.end(),[this](string t1, string t2){
-      return db->get_token_id(t1) > db->get_token_id(t2);
-    });*/
 
     //add ClosureItem
     const auto &rules=db->find_rule(follow);
@@ -323,5 +324,97 @@ void ClosureSet::expand(){
       closure.emplace_back(db, itr->get_rule_id(), itr->get_dot_index(), merged_look_aheads);
       merged_look_aheads.clear();
     }
+  }
+}
+
+DFA_Generator::DFA_Generator(std::shared_ptr<SyntaxDB> db)
+  :db(db)
+{
+  generate_dfa();
+  merge_la();
+}
+
+std::unordered_map<string, ClosureSet> DFA_Generator::generate_new_cs(const ClosureSet &cs) const {
+  std::unordered_map<string, std::vector<ClosureItem>> items;
+  for(const auto &ci : cs.get_closure()){
+    int rule_id=ci.get_rule_id();
+    int dot_index=ci.get_dot_index();
+    const auto &look_aheads=ci.get_look_aheads();
+    const auto &ptn=db->get_rule(rule_id).get_ptn();
+    if(dot_index>=ptn.size()) continue;
+    const string edge_label=ptn.at(dot_index);
+    items[edge_label].emplace_back(db, rule_id, dot_index, look_aheads);
+  }
+  std::unordered_map<string, ClosureSet> result;
+  for(const auto &pair : items){
+    result.emplace(pair.first,ClosureSet(db, pair.second));
+  }
+  return result;
+}
+
+std::weak_ptr<DFA_Node> DFA_Generator::search_edge_dest(const std::vector<std::shared_ptr<DFA_Node>> &dfa, const std::shared_ptr<DFA_Node> &target) const{
+  for(const auto &cand : dfa){
+    if(target->cs.is_same_lr1(cand->cs)) return std::weak_ptr<DFA_Node>(cand);
+  }
+  return std::weak_ptr<DFA_Node>(target);
+}
+
+void DFA_Generator::generate_dfa(){
+  ClosureItem initial_item(db, -1, 0, std::vector<string>({"EOF"}));
+  ClosureSet initial_set(db, std::vector<ClosureItem>({std::move(initial_item)}));
+  std::vector<std::shared_ptr<DFA_Node>> dfa {std::make_shared<DFA_Node>(std::move(initial_set))};
+  bool flg_changed=true;
+  while(flg_changed){
+    flg_changed=false;
+    for(int i=0;i<dfa.size();i++){
+      const ClosureSet &cs=dfa[i]->cs;
+      auto &edge=dfa[i]->edge;
+      const auto &new_sets=generate_new_cs(cs);
+      for(const auto &pair : new_sets){
+        std::shared_ptr<DFA_Node> new_node=std::make_shared<DFA_Node>(pair.second);
+        std::weak_ptr<DFA_Node> edge_to=search_edge_dest(dfa, new_node);
+        if(edge_to.lock()==new_node){
+          dfa.push_back(new_node);
+          flg_changed=true;
+        }
+        if(edge.count(pair.first)==0){
+          edge[pair.first]=edge_to;
+          flg_changed=true;
+        }
+      }
+    }
+  }
+  lr_dfa=dfa;
+}
+
+void DFA_Generator::merge_la(){
+  if(lalr_dfa.size()!=0 || lr_dfa.size()==0) return;
+  std::unordered_map<string, std::weak_ptr<DFA_Node>> edge_changes; // lr1_hash->weak_ptr<DFA_Node>
+  auto tmp_dfa=lr_dfa;
+  for(auto itr=tmp_dfa.begin();itr<tmp_dfa.end()-1;itr++){
+    if(!(*itr)) continue;
+    for(auto itr_inner=itr+1;itr_inner<tmp_dfa.end();itr++){
+      if(!(*itr_inner)) continue;
+      if((*itr)->cs.is_same_lr0((*itr_inner)->cs)){
+        auto new_node=std::make_shared<DFA_Node>((*itr)->cs.merge((*itr_inner)->cs));
+        new_node->edge=(*itr)->edge;
+        edge_changes[(*itr)->cs.get_lr1_hash()]=new_node;
+        edge_changes[(*itr_inner)->cs.get_lr1_hash()]=new_node;
+        *itr=std::move(new_node);
+        itr_inner->reset();
+      }
+    }
+  }
+  lalr_dfa.clear();
+  for(const auto &node_ptr : tmp_dfa){
+    if(!node_ptr) continue;
+    auto new_edge=node_ptr->edge;
+    for(auto &pair : new_edge){
+      if(edge_changes.count(pair.second.lock()->cs.get_lr1_hash())){
+        pair.second=edge_changes.at(pair.second.lock()->cs.get_lr1_hash());
+      }
+    }
+    lalr_dfa.push_back(std::make_shared<DFA_Node>(*node_ptr));
+    lalr_dfa.back()->edge=new_edge;
   }
 }
