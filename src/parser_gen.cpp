@@ -109,10 +109,11 @@ void SyntaxDB::init_token_def_map(){
 SyntaxDB::SyntaxDB(const std::vector<SyntaxDef> &arg_syntax_rules)
   :sd(arg_syntax_rules),
    fs(arg_syntax_rules, sd),
-   syntax_rules(arg_syntax_rules)
+   syntax_rules(arg_syntax_rules),
+   start_rule(META_START_SYMBOL, std::vector<string>({START_SYMBOL}))
 {
-  get_token_id(START_SYMBOL); //add to token_id_map
   get_token_id(META_START_SYMBOL); // add to token_id_map
+  get_token_id(START_SYMBOL); //add to token_id_map
   init_token_def_map();
 }
 
@@ -277,37 +278,42 @@ void ClosureSet::expand(){
     }
   }
   sort();
-  tmp_set=closure;
-  for(const auto &ci : tmp_set){
-    const auto &ptn=db->get_rule(ci.get_rule_id()).get_ptn();
-    const int dot_index=ci.get_dot_index();
-    if(dot_index>=ptn.size()){
-      continue;
-    }
-    const string follow=ptn.at(dot_index);
-    if(!db->get_sd().is_non_terminal(follow)){
-      continue;
-    }
+  bool flg_changed=true;
+  while(flg_changed){
+    flg_changed=false;
+    for(int i=0;i<closure.size();i++){
+      const auto &ci=closure[i];
+      const auto &ptn=db->get_rule(ci.get_rule_id()).get_ptn();
+      const int dot_index=ci.get_dot_index();
+      if(dot_index>=ptn.size()){
+        continue;
+      }
+      const string follow=ptn.at(dot_index);
+      if(!db->get_sd().is_non_terminal(follow)){
+        continue;
+      }
 
-    //get look-ahead
-    std::vector<string> first_index; // Token sequence to search first-tmp_set
-    // first_index=ptn[ci.dot_index+1 : -1]
-    for(auto itr=ptn.cbegin()+dot_index+1; itr<ptn.cend(); itr++){
-      first_index.push_back(*itr);
-    }
-    first_index.push_back(ci.get_look_aheads().at(0));
-    auto look_aheads=db->get_fs().get(first_index);
+      //get look-ahead
+      std::vector<string> first_index; // Token sequence to search first-tmp_set
+      // first_index=ptn[ci.dot_index+1 : -1]
+      for(auto itr=ptn.cbegin()+dot_index+1; itr<ptn.cend(); itr++){
+        first_index.push_back(*itr);
+      }
+      first_index.push_back(ci.get_look_aheads().at(0));
+      auto look_aheads=db->get_fs().get(first_index);
 
-    //add ClosureItem
-    const auto &rules=db->find_rule(follow);
-    for(const auto &rule : rules){
-      for(const auto &la : look_aheads){
-        ClosureItem new_ci(db, rule.first, 0, std::vector<string>({la}));
-        bool is_unique=!std::any_of(closure.begin(), closure.end(), [&new_ci](const auto &existing_item){
-          return new_ci.is_same_lr1(existing_item);
-        });
-        if(is_unique){
-          closure.push_back(new_ci);
+      //add ClosureItem
+      const auto &rules=db->find_rule(follow);
+      for(const auto &rule : rules){
+        for(const auto &la : look_aheads){
+          ClosureItem new_ci(db, rule.first, 0, std::vector<string>({la}));
+          bool is_unique=!std::any_of(closure.begin(), closure.end(), [&new_ci](const auto &existing_item){
+            return new_ci.is_same_lr1(existing_item);
+          });
+          if(is_unique){
+            closure.push_back(new_ci);
+            flg_changed=true;
+          }
         }
       }
     }
@@ -393,7 +399,7 @@ void DFA_Generator::merge_la(){
   auto tmp_dfa=lr_dfa;
   for(auto itr=tmp_dfa.begin();itr<tmp_dfa.end()-1;itr++){
     if(!(*itr)) continue;
-    for(auto itr_inner=itr+1;itr_inner<tmp_dfa.end();itr++){
+    for(auto itr_inner=itr+1;itr_inner<tmp_dfa.end();itr_inner++){
       if(!(*itr_inner)) continue;
       if((*itr)->cs.is_same_lr0((*itr_inner)->cs)){
         auto new_node=std::make_shared<DFA_Node>((*itr)->cs.merge((*itr_inner)->cs));

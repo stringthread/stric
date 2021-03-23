@@ -62,13 +62,13 @@ private:
   std::unordered_map<string, std::vector<std::pair<int, SyntaxDef>>> token_def_map;
   const string START_SYMBOL="main";
   const string META_START_SYMBOL="META_START_SYMBOL";
-  const SyntaxDef start_rule(META_START_SYMBOL, std::vector<string>({START_SYMBOL}));
+  const SyntaxDef start_rule;
   void init_token_def_map();
 public:
   SyntaxDB(const std::vector<SyntaxDef> &syntax_rules);
   const SymbolDiscriminator& get_sd() const { return sd; }
   const FirstSet& get_fs() const { return fs; }
-  const string& get_start_symbol() const { return start_symbol; }
+  const string& get_start_symbol() const { return START_SYMBOL; }
   const std::vector<std::pair<int, SyntaxDef>>& find_rule(const string &token) const;
   int get_token_id(const string &token);
   const SyntaxDef& get_rule(int rule_id) const;
@@ -141,6 +141,6 @@ private:
   void merge_la();
 public:
   DFA_Generator(std::shared_ptr<SyntaxDB> db);
-  const std::vector<std::shared_ptr<DFA_Node>>& get_lr_dfa() const { return lr_dfa; };
-  const std::vector<std::shared_ptr<DFA_Node>>& get_lalr_dfa() const { return lalr_dfa; };
+  const std::vector<std::shared_ptr<DFA_Node>>& get_lr_dfa() const { return lr_dfa; }; // lr_dfa[0]=initial_set
+  const std::vector<std::shared_ptr<DFA_Node>>& get_lalr_dfa() const { return lalr_dfa; }; // lr_dfa[0]=initial_set
 };
