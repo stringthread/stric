@@ -349,7 +349,7 @@ std::unordered_map<string, ClosureSet> DFA_Generator::generate_new_cs(const Clos
     const auto &ptn=db->get_rule(rule_id).get_ptn();
     if(dot_index>=ptn.size()) continue;
     const string edge_label=ptn.at(dot_index);
-    items[edge_label].emplace_back(db, rule_id, dot_index, look_aheads);
+    items[edge_label].emplace_back(db, rule_id, dot_index+1, look_aheads);
   }
   std::unordered_map<string, ClosureSet> result;
   for(const auto &pair : items){
