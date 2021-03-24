@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "parser_gen.h"
+#include "dfa.h"
 
 class ClosureTest : public ::testing::Test {
 protected:

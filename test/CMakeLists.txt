@@ -30,11 +30,11 @@ include_directories(../src)
 # test_lexer
 add_executable(tests
   test_lexer.cpp
-  test_parser_gen.cpp
+  test_dfa.cpp
 )
 target_link_libraries(tests
   lexer
-  parser_gen
+  dfa
   gtest
   gtest_main
   pthread
