@@ -160,72 +160,84 @@ TEST_F(DFATest, LR_DFATest){
   std::shared_ptr<DFA_Node> result_1;
   if(result[0]->edge.count("main")!=0){
     result_1=result[0]->edge["main"].lock();
+    ASSERT_TRUE(result_1)<<"shared_ptr expired";
     EXPECT_TRUE(result_1->cs.is_same_lr1(cs1)) <<result_1->cs.get_lr1_hash()<<" (expected: "<<cs1.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result[0]->edge.count("ATOM"),0);
   std::shared_ptr<DFA_Node> result_2;
   if(result[0]->edge.count("ATOM")!=0){
     result_2=result[0]->edge["ATOM"].lock();
+    ASSERT_TRUE(result_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_2->cs.is_same_lr1(cs2)) <<result_2->cs.get_lr1_hash()<<" (expected: "<<cs2.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result[0]->edge.count("DIGITS"),0);
   std::shared_ptr<DFA_Node> result_3;
   if(result[0]->edge.count("DIGITS")!=0){
     result_3=result[0]->edge["DIGITS"].lock();
+    ASSERT_TRUE(result_3)<<"shared_ptr expired";
     EXPECT_TRUE(result_3->cs.is_same_lr1(cs3)) <<result_3->cs.get_lr1_hash()<<" (expected: "<<cs3.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result[0]->edge.count("LPAREN"),0);
   std::shared_ptr<DFA_Node> result_4;
   if(result[0]->edge.count("LPAREN")!=0){
     result_4=result[0]->edge["LPAREN"].lock();
+    ASSERT_TRUE(result_4)<<"shared_ptr expired";
     EXPECT_TRUE(result_4->cs.is_same_lr1(cs4)) <<result_4->cs.get_lr1_hash()<<" (expected: "<<cs4.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result_4->edge.count("ATOM"),0);
   std::shared_ptr<DFA_Node> result_5;
   if(result_4->edge.count("ATOM")!=0){
     result_5=result_4->edge["ATOM"].lock();
+    ASSERT_TRUE(result_5)<<"shared_ptr expired";
     EXPECT_TRUE(result_5->cs.is_same_lr1(cs5)) <<result_5->cs.get_lr1_hash()<<" (expected: "<<cs5.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_4->edge.count("DIGITS"),0);
   std::shared_ptr<DFA_Node> result_6;
   if(result_4->edge.count("DIGITS")!=0){
     result_6=result_4->edge["DIGITS"].lock();
+    ASSERT_TRUE(result_6)<<"shared_ptr expired";
     EXPECT_TRUE(result_6->cs.is_same_lr1(cs6)) <<result_6->cs.get_lr1_hash()<<" (expected: "<<cs6.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result_4->edge.count("LPAREN"),0);
   std::shared_ptr<DFA_Node> result_7;
   if(result_4->edge.count("LPAREN")!=0){
     result_7=result_4->edge["LPAREN"].lock();
+    ASSERT_TRUE(result_7)<<"shared_ptr expired";
     EXPECT_TRUE(result_7->cs.is_same_lr1(cs7)) <<result_7->cs.get_lr1_hash()<<" (expected: "<<cs7.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_5->edge.count("RPAREN"),0);
   std::shared_ptr<DFA_Node> result_8;
   if(result_5->edge.count("RPAREN")!=0){
     result_8=result_5->edge["RPAREN"].lock();
+    ASSERT_TRUE(result_8)<<"shared_ptr expired";
     EXPECT_TRUE(result_8->cs.is_same_lr1(cs8)) <<result_8->cs.get_lr1_hash()<<" (expected: "<<cs8.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_7->edge.count("DIGITS"),0);
   std::shared_ptr<DFA_Node> result_6_2;
   if(result_7->edge.count("DIGITS")!=0){
     result_6_2=result_7->edge["DIGITS"].lock();
+    ASSERT_TRUE(result_6_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_6_2->cs.is_same_lr1(cs6)) <<result_6_2->cs.get_lr1_hash()<<" (expected: "<<cs6.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_7->edge.count("LPAREN"),0);
   std::shared_ptr<DFA_Node> result_7_2;
   if(result_7->edge.count("LPAREN")!=0){
     result_7_2=result_7->edge["LPAREN"].lock();
+    ASSERT_TRUE(result_7_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_7_2->cs.is_same_lr1(cs7)) <<result_7_2->cs.get_lr1_hash()<<" (expected: "<<cs7.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result_7->edge.count("ATOM"),0);
   std::shared_ptr<DFA_Node> result_9;
   if(result_7->edge.count("ATOM")!=0){
     result_9=result_7->edge["ATOM"].lock();
+    ASSERT_TRUE(result_9)<<"shared_ptr expired";
     EXPECT_TRUE(result_9->cs.is_same_lr1(cs9)) <<result_9->cs.get_lr1_hash()<<" (expected: "<<cs9.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_9->edge.count("RPAREN"),0);
   std::shared_ptr<DFA_Node> result_10;
   if(result_9->edge.count("RPAREN")!=0){
     result_10=result_9->edge["RPAREN"].lock();
+    ASSERT_TRUE(result_10)<<"shared_ptr expired";
     EXPECT_TRUE(result_10->cs.is_same_lr1(cs10)) <<result_10->cs.get_lr1_hash()<<" (expected: "<<cs10.get_lr1_hash()<<" )";
   }
 }
@@ -262,48 +274,56 @@ TEST_F(DFATest, LALR_DFATest){
   std::shared_ptr<DFA_Node> result_1;
   if(result[0]->edge.count("main")!=0){
     result_1=result[0]->edge["main"].lock();
+    ASSERT_TRUE(result_1)<<"shared_ptr expired";
     EXPECT_TRUE(result_1->cs.is_same_lr1(cs1)) <<result_1->cs.get_lr1_hash()<<" (expected: "<<cs1.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result[0]->edge.count("ATOM"),0);
   std::shared_ptr<DFA_Node> result_2;
   if(result[0]->edge.count("ATOM")!=0){
     result_2=result[0]->edge["ATOM"].lock();
+    ASSERT_TRUE(result_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_2->cs.is_same_lr1(cs2)) <<result_2->cs.get_lr1_hash()<<" (expected: "<<cs2.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result[0]->edge.count("LPAREN"),0);
   std::shared_ptr<DFA_Node> result_11;
   if(result[0]->edge.count("LPAREN")!=0){
     result_11=result[0]->edge["LPAREN"].lock();
+    ASSERT_TRUE(result_11)<<"shared_ptr expired";
     EXPECT_TRUE(result_11->cs.is_same_lr1(cs11)) <<result_11->cs.get_lr1_hash()<<" (expected: "<<cs11.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result[0]->edge.count("DIGITS"),0);
   std::shared_ptr<DFA_Node> result_12;
   if(result[0]->edge.count("DIGITS")!=0){
     result_12=result[0]->edge["DIGITS"].lock();
+    ASSERT_TRUE(result_12)<<"shared_ptr expired";
     EXPECT_TRUE(result_12->cs.is_same_lr1(cs12)) <<result_12->cs.get_lr1_hash()<<" (expected: "<<cs12.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_11->edge.count("LPAREN"),0);
   std::shared_ptr<DFA_Node> result_11_2;
   if(result_11->edge.count("LPAREN")!=0){
     result_11_2=result_11->edge["LPAREN"].lock();
+    ASSERT_TRUE(result_11_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_11_2->cs.is_same_lr1(cs11)) <<result_11_2->cs.get_lr1_hash()<<" (expected: "<<cs11.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_11->edge.count("DIGITS"),0);
   std::shared_ptr<DFA_Node> result_12_2;
   if(result_11->edge.count("DIGITS")!=0){
     result_12_2=result_11->edge["DIGITS"].lock();
+    ASSERT_TRUE(result_12_2)<<"shared_ptr expired";
     EXPECT_TRUE(result_12_2->cs.is_same_lr1(cs12)) <<result_12_2->cs.get_lr1_hash()<<" (expected: "<<cs12.get_lr1_hash()<<" )";
   }
   ASSERT_NE(result_11->edge.count("ATOM"),0);
   std::shared_ptr<DFA_Node> result_13;
   if(result_11->edge.count("ATOM")!=0){
     result_13=result_11->edge["ATOM"].lock();
+    ASSERT_TRUE(result_13)<<"shared_ptr expired";
     EXPECT_TRUE(result_13->cs.is_same_lr1(cs13)) <<result_13->cs.get_lr1_hash()<<" (expected: "<<cs13.get_lr1_hash()<<" )";
   }
   EXPECT_NE(result_13->edge.count("RPAREN"),0);
   std::shared_ptr<DFA_Node> result_14;
   if(result_13->edge.count("RPAREN")!=0){
     result_14=result_13->edge["RPAREN"].lock();
+    ASSERT_TRUE(result_14)<<"shared_ptr expired";
     EXPECT_TRUE(result_14->cs.is_same_lr1(cs14)) <<result_14->cs.get_lr1_hash()<<" (expected: "<<cs14.get_lr1_hash()<<" )";
   }
 }

@@ -395,18 +395,17 @@ void DFA_Generator::generate_dfa(){
 
 void DFA_Generator::merge_la(){
   if(lalr_dfa.size()!=0 || lr_dfa.size()==0) return;
-  std::unordered_map<string, std::weak_ptr<DFA_Node>> edge_changes; // lr1_hash->weak_ptr<DFA_Node>
+  std::unordered_map<string, std::shared_ptr<DFA_Node>> edge_changes; // lr1_hash->weak_ptr<DFA_Node>
   auto tmp_dfa=lr_dfa;
   for(auto itr=tmp_dfa.begin();itr<tmp_dfa.end()-1;itr++){
     if(!(*itr)) continue;
+    *itr=std::make_shared<DFA_Node>(**itr);
+    edge_changes[(*itr)->cs.get_lr1_hash()]=*itr;
     for(auto itr_inner=itr+1;itr_inner<tmp_dfa.end();itr_inner++){
       if(!(*itr_inner)) continue;
       if((*itr)->cs.is_same_lr0((*itr_inner)->cs)){
-        auto new_node=std::make_shared<DFA_Node>((*itr)->cs.merge((*itr_inner)->cs));
-        new_node->edge=(*itr)->edge;
-        edge_changes[(*itr)->cs.get_lr1_hash()]=new_node;
-        edge_changes[(*itr_inner)->cs.get_lr1_hash()]=new_node;
-        *itr=std::move(new_node);
+        (*itr)->cs=(*itr)->cs.merge((*itr_inner)->cs);
+        edge_changes[(*itr_inner)->cs.get_lr1_hash()]=*itr;
         itr_inner->reset();
       }
     }
@@ -414,13 +413,12 @@ void DFA_Generator::merge_la(){
   lalr_dfa.clear();
   for(const auto &node_ptr : tmp_dfa){
     if(!node_ptr) continue;
-    auto new_edge=node_ptr->edge;
+    auto &new_edge=node_ptr->edge;
     for(auto &pair : new_edge){
       if(edge_changes.count(pair.second.lock()->cs.get_lr1_hash())){
         pair.second=edge_changes.at(pair.second.lock()->cs.get_lr1_hash());
       }
     }
-    lalr_dfa.push_back(std::make_shared<DFA_Node>(*node_ptr));
-    lalr_dfa.back()->edge=new_edge;
+    lalr_dfa.push_back(node_ptr);
   }
 }
