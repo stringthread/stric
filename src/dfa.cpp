@@ -47,7 +47,7 @@ FirstSet::FirstSet(const std::vector<SyntaxDef> &syntax_rules, SymbolDiscriminat
 {
   first_map.clear();
   std::unordered_map<string, std::unordered_set<string>> first_result;
-  first_result["EOF"]={"EOF"};
+  first_result[EOF_SYMBOL]={EOF_SYMBOL};
   const auto &terminals=symbol_dis.get_terminals();
   for(const auto &token : terminals){
     first_result[token]={token};
@@ -366,7 +366,7 @@ std::weak_ptr<DFA_Node> DFA_Generator::search_edge_dest(const std::vector<std::s
 }
 
 void DFA_Generator::generate_dfa(){
-  ClosureItem initial_item(db, -1, 0, std::vector<string>({"EOF"}));
+  ClosureItem initial_item(db, -1, 0, std::vector<string>({EOF_SYMBOL}));
   ClosureSet initial_set(db, std::vector<ClosureItem>({std::move(initial_item)}));
   std::vector<std::shared_ptr<DFA_Node>> dfa {std::make_shared<DFA_Node>(std::move(initial_set))};
   bool flg_changed=true;

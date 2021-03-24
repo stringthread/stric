@@ -9,6 +9,10 @@ using std::string;
 using std::cout;
 using std::endl;
 
+const string START_SYMBOL="main";
+const string META_START_SYMBOL="META_START_SYMBOL";
+const string EOF_SYMBOL="EOF";
+
 class SyntaxDef{
 private:
   string l_token;
@@ -60,8 +64,6 @@ private:
   int token_id_counter=0;
   const std::vector<SyntaxDef> &syntax_rules;
   std::unordered_map<string, std::vector<std::pair<int, SyntaxDef>>> token_def_map;
-  const string START_SYMBOL="main";
-  const string META_START_SYMBOL="META_START_SYMBOL";
   const SyntaxDef start_rule;
   void init_token_def_map();
 public:

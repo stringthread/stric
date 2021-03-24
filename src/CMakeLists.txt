@@ -4,3 +4,5 @@ project(stric CXX)
 add_library(lexer STATIC lexer.cpp)
 
 add_library(dfa STATIC dfa.cpp)
+
+add_library(parser_gen STATIC parser_gen.cpp)
