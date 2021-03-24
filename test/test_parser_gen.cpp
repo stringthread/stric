@@ -92,6 +92,18 @@ TEST_F(ClosureTest, ClosureSetTest){
   }
 }
 
+TEST_F(ClosureTest, ClosureSetMergeTest){
+  ClosureItem ci_part_1_1(db, 4, 0, std::vector<string>({"DIGITS"}));
+  ClosureItem ci_part_1_2(db, 5, 0, std::vector<string>({"DIGITS"}));
+  ClosureItem ci_part_2_1(db, 4, 0, std::vector<string>({"LPAREN"}));
+  ClosureSet cs_part_1(db, std::vector<ClosureItem>({ci_part_1_1, ci_part_1_2}));
+  ClosureSet cs_part_2(db, std::vector<ClosureItem>({ci_part_2_1, ci_part_1_2}));
+  ClosureSet cs_merged=cs_part_1.merge(cs_part_2);
+  ClosureItem ci_expected_1(db, 4, 0, std::vector<string>({"DIGITS", "LPAREN"}));
+  ClosureSet cs_expected(db, std::vector<ClosureItem>({ci_expected_1, ci_part_1_2}));
+  ASSERT_TRUE(cs_merged.is_same_lr1(cs_expected));
+}
+
 class DFATest : public ::testing::Test {
 protected:
   virtual void SetUp() {
@@ -242,8 +254,9 @@ TEST_F(DFATest, LALR_DFATest){
   ClosureSet cs14(db, std::vector<ClosureItem>({ci14_1}));
   // Actual process
   DFA_Generator dfa_g(db);
-  const auto result=dfa_g.get_lr_dfa();
+  const auto result=dfa_g.get_lalr_dfa();
   // Assertions
+  ASSERT_NE(result.size(), 0);
   ASSERT_TRUE(result[0]->cs.is_same_lr1(cs0)) <<result[0]->cs.get_lr1_hash()<<" (expected: "<<cs0.get_lr1_hash()<<" )";
   EXPECT_NE(result[0]->edge.count("main"),0);
   std::shared_ptr<DFA_Node> result_1;
