@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "parser_gen.h"
+#include "parser_operations.h"
 
 class ParserGenTest : public ::testing::Test {
 protected:

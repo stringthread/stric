@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "dfa.h"
-#include "parser_operations.h"
+class IOperation;
 
 using std::string;
 using std::cout;

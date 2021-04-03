@@ -1,4 +1,5 @@
 #include "parser_gen.h"
+#include "parser_operations.h"
 
 ParserGenerator::ParserGenerator(const std::vector<SyntaxDef> &syntax_rules)
   :db(std::make_shared<SyntaxDB>(syntax_rules)), dfa_gen(db)

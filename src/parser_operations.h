@@ -5,6 +5,8 @@
 #include <stack>
 #include <memory>
 
+#include "parser.h"
+
 using std::string;
 using std::cout;
 using std::endl;
@@ -17,9 +19,9 @@ class AST_Node;
 
 class IOperation{
 public:
-  virtual OperationType type() const {};
+  virtual OperationType type() const=0;
   virtual bool operator==(const IOperation&) const=0;
-  //virtual size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const=0;
+  virtual bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const=0;
 };
 
 class AcceptOperation : public IOperation{
@@ -28,7 +30,7 @@ public:
   bool operator==(const IOperation &op) const override {
     return op.type()==OperationType::Accept;
   }
-  //size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const override;
+  bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const override;
 };
 class GotoOperation : public IOperation{
 public:
@@ -38,7 +40,7 @@ public:
   bool operator==(const IOperation &op) const override {
     return op.type()==OperationType::Goto && to==dynamic_cast<const GotoOperation&>(op).to;
   }
-  //size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const override;
+  bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const override;
 };
 class ReduceOperation : public IOperation{
 public:
@@ -48,7 +50,7 @@ public:
   bool operator==(const IOperation &op) const override {
     return op.type()==OperationType::Reduce && rule_id==dynamic_cast<const ReduceOperation&>(op).rule_id;
   }
-  //size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const override;
+  bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const override;
 };
 class ShiftOperation : public IOperation{
 public:
@@ -58,7 +60,7 @@ public:
   bool operator==(const IOperation &op) const override {
     return op.type()==OperationType::Shift && to==dynamic_cast<const ShiftOperation&>(op).to;
   }
-  //size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const override;
+  bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const override;
 };
 class ConflictOperation : public IOperation{
 public:
@@ -71,5 +73,5 @@ public:
   bool operator==(const IOperation &op) const override {
     return op.type()==OperationType::Conflict && shift_to==dynamic_cast<const ConflictOperation&>(op).shift_to && reduce_rule_id==dynamic_cast<const ConflictOperation&>(op).reduce_rule_id;
   }
-  //size_t operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack) const override;
+  bool operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const override;
 };
