@@ -15,8 +15,8 @@ public:
 };
 
 void check_table(const ParsingTable &result_table, const ClosureSet &expected_cs, const ParsingTableRow &expected_row){
-  ASSERT_NE(result_table.count(expected_cs.get_lr1_hash()), 0)<<"Row key not exist: "<<expected_cs.get_lr1_hash();
-  const ParsingTableRow &result_row=result_table.at(expected_cs.get_lr1_hash());
+  ASSERT_NE(result_table.first.count(expected_cs.get_lr1_hash()), 0)<<"Row key not exist: "<<expected_cs.get_lr1_hash();
+  const ParsingTableRow &result_row=result_table.first.at(expected_cs.get_lr1_hash());
   ASSERT_EQ(result_row.size(), expected_row.size());
   for(const auto &pair : expected_row){
     ASSERT_NE(result_row.count(pair.first), 0)<<"Empty cell: ("<<expected_cs.get_lr1_hash()<<" , "<<pair.first<<")";
@@ -85,7 +85,8 @@ TEST_F(ParserGenTest, ParsingTableTest){
   EXPECT_NE(parser_gen.get_table_type(), TableType::EMPTY);
   EXPECT_NE(parser_gen.get_table_type(), TableType::LR1);
   EXPECT_NE(parser_gen.get_table_type(), TableType::CONFLICT);
-  ASSERT_EQ(expected_row_vec.size(), result_table.size());
+  EXPECT_EQ(result_table.second, cs0.get_lr1_hash());
+  ASSERT_EQ(expected_row_vec.size(), result_table.first.size());
   for (size_t i = 0; i < expected_cs_vec.size(); i++) {
     check_table(result_table, expected_cs_vec[i], expected_row_vec[i]);
   }

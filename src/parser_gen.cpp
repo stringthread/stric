@@ -58,7 +58,8 @@ std::pair<ParsingTable, bool> ParserGenerator::generate_parsing_table(std::vecto
         table_row[la_label]=std::make_shared<ConflictOperation>(table_row[la_label], item.get_rule_id());
       }
     }
-    tmp_table[node_ptr->cs.get_lr1_hash()]=std::move(table_row);
+    tmp_table.first[node_ptr->cs.get_lr1_hash()]=std::move(table_row);
+    tmp_table.second=dfa[0]->cs.get_lr1_hash();
   }
   return std::pair<ParsingTable, bool>(tmp_table, flg_conflicted);
 }

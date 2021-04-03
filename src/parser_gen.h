@@ -74,7 +74,7 @@ public:
 };
 
 using ParsingTableRow=std::unordered_map<string, std::shared_ptr<IOperation>>;
-using ParsingTable = std::unordered_map<string, ParsingTableRow>;//cs_lr1_hash->row
+using ParsingTable = std::pair<std::unordered_map<string, ParsingTableRow>, string>;//(cs_lr1_hash->row, initial_set.lr1_hash)
 
 class ParserGenerator{
 private:
