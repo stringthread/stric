@@ -1,23 +1,29 @@
 #include "parser_gen.h"
 
-ConflictOperation::ConflictOperation(const IOperation &op, int arg_reduce_rule_id){
-  switch(op.type()){
+ConflictOperation::ConflictOperation(const std::shared_ptr<IOperation> op, int arg_reduce_rule_id){
+  switch(op->type()){
     case OperationType::Shift:
-      shift_to.push_back(dynamic_cast<const ShiftOperation&>(op).to);
+      shift_to.push_back(std::dynamic_pointer_cast<ShiftOperation>(op)->to);
       break;
     case OperationType::Reduce:
-      reduce_rule_id.push_back(dynamic_cast<const ReduceOperation&>(op).rule_id);
+      reduce_rule_id.push_back(std::dynamic_pointer_cast<ReduceOperation>(op)->rule_id);
       break;
     case OperationType::Conflict:
-      const ConflictOperation casted_op=dynamic_cast<const ConflictOperation&>(op);
-      shift_to=casted_op.shift_to;
-      reduce_rule_id=casted_op.reduce_rule_id;
+      const auto casted_op=std::dynamic_pointer_cast<ConflictOperation>(op);
+      shift_to=casted_op->shift_to;
+      reduce_rule_id=casted_op->reduce_rule_id;
   }
   reduce_rule_id.push_back(arg_reduce_rule_id);
 }
 
 ParserGenerator::ParserGenerator(const std::vector<SyntaxDef> &syntax_rules)
   :db(std::make_shared<SyntaxDB>(syntax_rules)), dfa_gen(db)
+{
+  init_table();
+}
+
+ParserGenerator::ParserGenerator(std::shared_ptr<SyntaxDB> db)
+  :db(db), dfa_gen(db)
 {
   init_table();
 }
@@ -30,26 +36,26 @@ std::pair<ParsingTable, bool> ParserGenerator::generate_parsing_table(std::vecto
     for(const auto &pair_edge : node_ptr->edge){
       string item_label=pair_edge.first;
       if(db->get_sd().is_terminal(item_label)){
-        table_row[item_label]=ShiftOperation(pair_edge.second.lock()->cs.get_lr1_hash());
+        table_row[item_label]=std::make_shared<ShiftOperation>(pair_edge.second.lock()->cs.get_lr1_hash());
       }else if(db->get_sd().is_non_terminal(item_label)){
-        table_row[item_label]=GotoOperation(pair_edge.second.lock()->cs.get_lr1_hash());
+        table_row[item_label]=std::make_shared<GotoOperation>(pair_edge.second.lock()->cs.get_lr1_hash());
       }
     }
     for(const auto &item : node_ptr->cs.get_closure()){
       if(item.get_dot_index()!=db->get_rule(item.get_rule_id()).get_ptn().size()) continue;
       if(item.get_rule_id()==-1){
-        table_row[EOF_SYMBOL]=AcceptOperation();
+        table_row[EOF_SYMBOL]=std::make_shared<AcceptOperation>();
         continue;
       }
       for(const auto &la_label : item.get_look_aheads()){
         if (table_row.count(la_label)==0) {
           //if not Conflicted
-          table_row[la_label]=ReduceOperation(item.get_rule_id());
+          table_row[la_label]=std::make_shared<ReduceOperation>(item.get_rule_id());
           continue;
         }
         //if conflicted
         flg_conflicted=true;
-        table_row[la_label]=ConflictOperation(table_row[la_label], item.get_rule_id());
+        table_row[la_label]=std::make_shared<ConflictOperation>(table_row[la_label], item.get_rule_id());
       }
     }
     tmp_table[node_ptr->cs.get_lr1_hash()]=std::move(table_row);
@@ -59,7 +65,7 @@ std::pair<ParsingTable, bool> ParserGenerator::generate_parsing_table(std::vecto
 
 void ParserGenerator::init_table(){
   auto result=generate_parsing_table(dfa_gen.get_lalr_dfa());
-  if(result.second){
+  if(!result.second){
     parsing_table=result.first;
     table_type=TableType::LALR1;
     return;
@@ -67,7 +73,7 @@ void ParserGenerator::init_table(){
   result=generate_parsing_table(dfa_gen.get_lr_dfa());
   parsing_table=result.first;
   table_type=TableType::LR1;
-  if(!result.second){
+  if(result.second){
     table_type=TableType::CONFLICT;
   }
 }
