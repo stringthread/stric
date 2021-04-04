@@ -26,9 +26,10 @@ bool GotoOperation::operate(std::stack<string> &state_stack, std::stack<AST_Node
 }
 
 bool ReduceOperation::operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const {
-  const auto &rule=parser.get_db().get_rule(rule_id);
+  const auto &rule=parser.get_db()->get_rule(rule_id);
   for(size_t i=0;i<rule.get_ptn().size();i++) state_stack.pop();
-  std::vector<AST_Node> children(rule.get_ptn().size());
+  std::vector<AST_Node> children;
+  children.reserve(rule.get_ptn().size());
   for(size_t i=0;i<rule.get_ptn().size();i++){
     children.push_back(result_stack.top());
     result_stack.pop();

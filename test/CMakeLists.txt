@@ -32,11 +32,13 @@ add_executable(tests
   test_lexer.cpp
   test_dfa.cpp
   test_parser_gen.cpp
+  test_parser.cpp
 )
 target_link_libraries(tests
   lexer
   dfa
   parser_gen
+  parser
   gtest
   gtest_main
   pthread

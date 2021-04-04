@@ -41,7 +41,6 @@ public:
 class Lexer{
 private:
   static vector<LexDef> TokenLex;
-
 public:
   vector<Token> analize(string code) const;
 };

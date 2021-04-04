@@ -1,6 +1,16 @@
 #include "parser.h"
 #include "parser_operations.h"
 
+string AST_Node::str() const{
+  std::ostringstream oss;
+  oss << "{" << type << ", \"" << value << "\", [\n";
+  for(const AST_Node &child : children){
+    oss << child.str() << '\n';
+  }
+  oss << "] }" << '\n';
+  return oss.str();
+}
+
 AST_Node Parser::_parse(const std::vector<Token> &input){
   size_t input_index=0;
   std::stack<string> state_stack;
@@ -11,7 +21,7 @@ AST_Node Parser::_parse(const std::vector<Token> &input){
     const string &token=input[input_index].token;
     const string &state=state_stack.top();
     if(parsing_table.first.at(state).count(token)==0){
-      std::cout << "unexpected token" << '\n';
+      std::cout << "unexpected token : [ " << state << " ][ " << token << " ]\n";
       flg_err=true;
       break;
     }

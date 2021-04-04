@@ -34,4 +34,5 @@ public:
   TableType get_table_type() const { return table_type; }
   bool is_conflict() const { return table_type==TableType::CONFLICT; }
   const ParsingTable& get_parsing_table() const { return parsing_table; }
+  std::shared_ptr<SyntaxDB> get_db() const { return db; }
 };
