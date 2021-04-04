@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "lexer.h"
+#include "parser/lexer.h"
 
 TEST(LexerTest, LexerAnalizeTest){
   Lexer lexer;

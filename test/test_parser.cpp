@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include "parser.h"
-#include "syntax.h"
-#include "lexer.h"
-#include "parser_gen.h"
+#include "parser/parser.h"
+#include "parser/syntax.h"
+#include "parser/lexer.h"
+#include "parser/parser_gen.h"
 
 class ParserTest : public ::testing::Test {
 protected:
