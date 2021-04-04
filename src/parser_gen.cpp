@@ -29,7 +29,7 @@ std::pair<ParsingTable, bool> ParserGenerator::generate_parsing_table(std::vecto
     for(const auto &item : node_ptr->cs.get_closure()){
       if(item.get_dot_index()!=db->get_rule(item.get_rule_id()).get_ptn().size()) continue;
       if(item.get_rule_id()==-1){
-        table_row[EOF_SYMBOL]=std::make_shared<AcceptOperation>();
+        table_row[Syntax::EOF_SYMBOL]=std::make_shared<AcceptOperation>();
         continue;
       }
       for(const auto &la_label : item.get_look_aheads()){

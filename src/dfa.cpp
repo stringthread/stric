@@ -47,7 +47,7 @@ FirstSet::FirstSet(const std::vector<SyntaxDef> &syntax_rules, SymbolDiscriminat
 {
   first_map.clear();
   std::unordered_map<string, std::unordered_set<string>> first_result;
-  first_result[EOF_SYMBOL]={EOF_SYMBOL};
+  first_result[Syntax::EOF_SYMBOL]={Syntax::EOF_SYMBOL};
   const auto &terminals=symbol_dis.get_terminals();
   for(const auto &token : terminals){
     first_result[token]={token};
@@ -110,10 +110,10 @@ SyntaxDB::SyntaxDB(const std::vector<SyntaxDef> &arg_syntax_rules)
   :sd(arg_syntax_rules),
    fs(arg_syntax_rules, sd),
    syntax_rules(arg_syntax_rules),
-   start_rule(META_START_SYMBOL, std::vector<string>({START_SYMBOL}))
+   start_rule(Syntax::META_START_SYMBOL, std::vector<string>({Syntax::START_SYMBOL}))
 {
-  get_token_id(META_START_SYMBOL); // add to token_id_map
-  get_token_id(START_SYMBOL); //add to token_id_map
+  get_token_id(Syntax::META_START_SYMBOL); // add to token_id_map
+  get_token_id(Syntax::START_SYMBOL); //add to token_id_map
   init_token_def_map();
 }
 
@@ -366,7 +366,7 @@ std::weak_ptr<DFA_Node> DFA_Generator::search_edge_dest(const std::vector<std::s
 }
 
 void DFA_Generator::generate_dfa(){
-  ClosureItem initial_item(db, -1, 0, std::vector<string>({EOF_SYMBOL}));
+  ClosureItem initial_item(db, -1, 0, std::vector<string>({Syntax::EOF_SYMBOL}));
   ClosureSet initial_set(db, std::vector<ClosureItem>({std::move(initial_item)}));
   std::vector<std::shared_ptr<DFA_Node>> dfa {std::make_shared<DFA_Node>(std::move(initial_set))};
   bool flg_changed=true;

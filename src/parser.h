@@ -8,7 +8,7 @@
 #include <sstream>
 
 #include "lexer.h"
-#include "dfa.h"
+#include "syntax.h"
 #include "parser_gen.h"
 
 using std::string;
