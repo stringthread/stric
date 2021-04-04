@@ -35,9 +35,6 @@ add_executable(tests
   test_parser.cpp
 )
 target_link_libraries(tests
-  lexer
-  dfa
-  parser_gen
   parser
   gtest
   gtest_main

@@ -59,6 +59,6 @@ bool ShiftOperation::operate(std::stack<string> &state_stack, std::stack<AST_Nod
 }
 
 bool ConflictOperation::operate(std::stack<string> &state_stack, std::stack<AST_Node> &result_stack, Parser& parser, std::vector<Token> input, size_t &input_index) const {
-  std::cout << "conflict found" << '\n';
+  std::cout << "conflict found for " << string(input[input_index]) << '\n';
   return true;
 }
