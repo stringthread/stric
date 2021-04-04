@@ -35,3 +35,20 @@ AST_Node Parser::_parse(const std::vector<Token> &input){
   }
   return result_stack.top();
 }
+
+Parser Parser::create(Lexer lex, std::shared_ptr<SyntaxDB> db){
+  ParserGenerator gen(db);
+  return Parser(lex, db, gen.get_parsing_table());
+}
+
+Parser Parser::create(){
+  return create(Lexer(), Syntax::db);
+}
+
+Parser Parser::create(Lexer lex){
+  return create(lex, Syntax::db);
+}
+
+Parser Parser::create(std::shared_ptr<SyntaxDB> db){
+  return create(Lexer(),db);
+}

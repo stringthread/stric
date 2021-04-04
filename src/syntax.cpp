@@ -1,0 +1,205 @@
+#include "syntax.h"
+
+const std::vector<LexDef> Syntax::tokens {
+   {"", R"***( +)***"}, // whitespace: ignore
+   {"", R"***(\r?\n)***"}, // EOL: ignore
+   {"EOS", R"***(;)***"},
+   {"NULL", "null", true},
+   {"TRUE", R"***(@t)***", true},
+   {"FALSE", R"***(@f)***", true},
+   {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
+   {"FLOAT", R"***(([0-9]+\.[0-9]*|[0-9]*\.[0-9]+))***"}, // "2.", ".5", ".2"=> OK, "."=>NG
+   {"INT", R"***([1-9][0-9]*)***"},
+   {"TYPE_INT", R"***(int)***", true},
+   {"TYPE_FLOAT", R"***(float)***", true},
+   {"TYPE_BOOL", R"***(bool)***", true},
+   {"PLUS", R"***(\+)***"},
+   {"MINUS", R"***(-)***"},
+   {"ASTERISK", R"***(\*)***"},
+   {"DIV_INT", R"***(//)***"},
+   {"SLASH", R"***(/)***"},
+   {"ANDAND", R"***(&&)***"},
+   {"AND", R"***(&)***"},
+   {"OROR", R"***(\|\|)***"},
+   {"OR", R"***(\|)***"},
+   {"HAT", R"***(^)***"},
+   {"NOT", R"***(not|\|)***"},
+   {"EQUAL", R"***(==)***"},
+   {"NOT_EQUAL", R"***(!=)***"},
+   {"LESS_EQUAL", R"***(<=)***"},
+   {"GREATER_EQUAL", R"***(>=)***"},
+   {"LEFT_ANGLE_BRACKET", R"***(<)***"},
+   {"RIGHT_ANGLE_BRACKET", R"***(>)***"},
+   {"LEFT_PAREN", R"***(\()***"},
+   {"RIGHT_PAREN", R"***(\))***"},
+   {"LEFT_BRACE", R"***(\{)***"},
+   {"RIGHT_BRACE", R"***(\})***"},
+   {"LEFT_BRACKET", R"***(\[)***"},
+   {"RIGHT_BRACKET", R"***(\])***"},
+   {"ASSIGN", R"***(=)***"},
+   {"IDENTIFIER", ""+IDENTIFIER_START_CHAR+IDENTIFIER_CHAR+"*"},
+};
+const std::vector<SyntaxDef> Syntax::syntax_rules {
+  {"main", std::vector<string>({"main","PLUS","TERM"})},
+  {"main", std::vector<string>({"TERM"})},
+  {"TERM", std::vector<string>({"TERM","ASTERISK","ATOM"})},
+  {"TERM", std::vector<string>({"ATOM"})},
+  {"ATOM", std::vector<string>({"INT"})},
+  {"ATOM", std::vector<string>({"LEFT_PAREN", "main", "RIGHT_PAREN"})},
+};
+const std::shared_ptr<SyntaxDB> Syntax::db=std::make_shared<SyntaxDB>(syntax_rules);
+
+string LexDef::format_regex(string& arg_ptn, bool flg_force_end){
+  arg_ptn="^"+arg_ptn;
+  if(flg_force_end) arg_ptn+="(?!"+Syntax::IDENTIFIER_CHAR+"})";
+  return arg_ptn;
+}
+
+string LexDef::match(string str) const{
+  std::smatch m;
+  bool result=std::regex_search(str,m,ptn);
+  if(!result) return "";
+  return m.str();
+}
+
+SymbolDiscriminator::SymbolDiscriminator(const std::vector<SyntaxDef> &syntax_rules){
+  terminals.clear();
+  non_terminals.clear();
+  for(const auto &def : syntax_rules){
+    non_terminals.insert(def.get_l_token());
+  }
+  for(const auto &def : syntax_rules){
+    const auto & ptn=def.get_ptn();
+    for(const auto &token : ptn){
+      if(!is_non_terminal(token)) terminals.insert(token);
+    }
+  }
+}
+
+FirstSet::NullableSet::NullableSet(const std::vector<SyntaxDef> &syntax_rules){
+  nulls_set.clear();
+  for(const auto &def : syntax_rules){
+    if(def.get_ptn().size()==0) nulls_set.insert(def.get_l_token());
+  }
+  bool flg_changed=true;
+  while(flg_changed){
+    flg_changed=false;
+    for(const auto &def : syntax_rules){
+      if(nulls_set.count(def.get_l_token())==1) continue;
+      bool is_nulls=true;
+      const auto &ptn=def.get_ptn();
+      for(const auto &token : ptn){
+        if(nulls_set.count(token)!=1){
+          is_nulls=false;
+          break;
+        }
+      }
+      if(is_nulls){
+        nulls_set.insert(def.get_l_token());
+        flg_changed=true;
+      }
+    }
+  }
+}
+
+FirstSet::FirstSet(const std::vector<SyntaxDef> &syntax_rules, SymbolDiscriminator symbol_dis)
+  :nulls(syntax_rules)
+{
+  first_map.clear();
+  std::unordered_map<string, std::unordered_set<string>> first_result;
+  first_result[Syntax::EOF_SYMBOL]={Syntax::EOF_SYMBOL};
+  const auto &terminals=symbol_dis.get_terminals();
+  for(const auto &token : terminals){
+    first_result[token]={token};
+  }
+  const auto &non_terminals=symbol_dis.get_non_terminals();
+  for(const auto &token : non_terminals){
+    first_result[token]={};
+  }
+  std::vector<std::array<string,2>> constraint {}; //[superset, subset]
+  for(const auto &rule : syntax_rules){
+    const string &sup=rule.get_l_token();
+    const auto &ptn=rule.get_ptn();
+    for(const auto &sub : ptn){
+      if(sup!=sub) constraint.push_back({sup, sub});
+      if(!nulls.is_nullable(sub)) break;
+    }
+  }
+  bool flg_changed=true;
+  while(flg_changed){
+    flg_changed=false;
+    for(const auto &pair : constraint){
+      auto &supset=first_result.at(pair[0]);
+      const auto &subset=first_result.at(pair[1]);
+      for(const auto &token : subset){
+        if(supset.count(token)==0){
+          supset.insert(token);
+          flg_changed=true;
+        }
+      }
+    }
+  }
+  first_map=first_result;
+}
+
+const std::unordered_set<string>& FirstSet::get(const string &token) const {
+  return first_map.at(token);
+}
+
+std::unordered_set<string> FirstSet::get(const std::vector<string> &tokens) const {
+  std::unordered_set<string> result;
+  result.clear();
+  for(const auto &token : tokens){
+    const auto &f_set_token=get(token);
+    for(const auto &f_item : f_set_token){
+      result.insert(f_item);
+    }
+    if(!nulls.is_nullable(token)) break;
+  }
+  return std::move(result);
+}
+
+void SyntaxDB::init_token_def_map(){
+  for(int i=0;i<syntax_rules.size();i++){
+    const auto &rule=syntax_rules[i];
+    token_def_map[rule.get_l_token()].push_back(std::pair<int,SyntaxDef>(i,rule));
+  }
+}
+
+SyntaxDB::SyntaxDB(const std::vector<SyntaxDef> &arg_syntax_rules)
+  :sd(arg_syntax_rules),
+   fs(arg_syntax_rules, sd),
+   syntax_rules(arg_syntax_rules),
+   start_rule(Syntax::META_START_SYMBOL, std::vector<string>({Syntax::START_SYMBOL}))
+{
+  get_token_id(Syntax::META_START_SYMBOL); // add to token_id_map
+  get_token_id(Syntax::START_SYMBOL); //add to token_id_map
+  init_token_def_map();
+}
+
+int SyntaxDB::get_token_id(const string &token){
+  try{
+    return token_id_map.at(token);
+  }
+  catch(std::out_of_range&){
+    token_id_map[token]=token_id_counter;
+    token_id_counter++;
+    return token_id_map[token];
+  }
+}
+
+const std::vector<std::pair<int, SyntaxDef>>& SyntaxDB::find_rule(const string &token) const {
+  return token_def_map.at(token);
+}
+
+const SyntaxDef& SyntaxDB::get_rule(int rule_id) const {
+  if(rule_id==-1) return start_rule;
+  return syntax_rules[rule_id];
+}
+
+int SyntaxDB::get_rule_id(const SyntaxDef &rule) const {
+  if(rule==start_rule) return -1;
+  const auto& itr=std::find(syntax_rules.begin(), syntax_rules.end(), rule);
+  if(itr==syntax_rules.end()) return -100;
+  return std::distance(syntax_rules.begin(), itr);
+}

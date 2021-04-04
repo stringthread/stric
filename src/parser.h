@@ -19,13 +19,20 @@ class AST_Node{
 public:
   string type;
   string value;
+  int rule_id; // -2 for terminals
   std::vector<AST_Node> children;
   AST_Node()=default;
-  AST_Node(const Token &token):type(token.token),value(token.value){}
-  AST_Node(const string &type, const string &value):type(type),value(value){}
-  AST_Node(const string &type, const string &value, std::vector<AST_Node> &&children):type(type),value(value),children(children){}
+  AST_Node(const Token &token)
+  :type(token.token),value(token.value),rule_id(-2){}
+  AST_Node(const string &type, const string &value, int rule_id)
+  :type(type),value(value),rule_id(rule_id){}
+  AST_Node(const string &type, const string &value, int rule_id, std::vector<AST_Node> &&children)
+  :type(type),value(value),rule_id(rule_id),children(children){}
   bool operator==(const AST_Node& node) const noexcept{
-    return type==node.type && value==node.value && children==node.children;
+    return type==node.type
+        && value==node.value
+        && rule_id==node.rule_id
+        && children==node.children;
   }
   string str() const;
 };
@@ -44,4 +51,8 @@ public:
   }
   const ParsingTable& get_parsing_table() const { return parsing_table; }
   const std::shared_ptr<SyntaxDB> get_db() const { return db; }
+  static Parser create(Lexer lex, std::shared_ptr<SyntaxDB> db);
+  static Parser create();
+  static Parser create(Lexer lex);
+  static Parser create(std::shared_ptr<SyntaxDB> db);
 };

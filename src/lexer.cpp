@@ -1,20 +1,5 @@
 #include "lexer.h"
 
-using namespace std;
-
-string LexDef::format_regex(string& arg_ptn, bool flg_force_end){
-  arg_ptn="^"+arg_ptn;
-  if(flg_force_end) arg_ptn+="(?!"+Syntax::IDENTIFIER_CHAR+"})";
-  return arg_ptn;
-}
-
-string LexDef::match(string str) const{
-  std::smatch m;
-  bool result=std::regex_search(str,m,ptn);
-  if(!result) return "";
-  return m.str();
-}
-
 vector<Token> Lexer::analize(string code) const{
   int pos=0;
   bool flg_match;

@@ -35,7 +35,7 @@ bool ReduceOperation::operate(std::stack<string> &state_stack, std::stack<AST_No
     result_stack.pop();
   }
   std::reverse(children.begin(), children.end());
-  result_stack.emplace(rule.get_l_token(), "", std::move(children));
+  result_stack.emplace(rule.get_l_token(), "", rule_id, std::move(children));
   const auto &state=state_stack.top();
   const auto &l_token=rule.get_l_token();
   if(parser.get_parsing_table().first.at(state).count(l_token)==0){

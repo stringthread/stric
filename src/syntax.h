@@ -57,48 +57,6 @@ public:
   bool operator==(const SyntaxDef &t) const { return this->l_token==t.l_token && this->ptn==t.ptn; }
 };
 
-namespace Syntax{
-  const std::vector<LexDef> tokens {
-     {"", R"***( +)***"}, // whitespace: ignore
-     {"", R"***(\r?\n)***"}, // EOL: ignore
-     {"EOS", R"***(;)***"},
-     {"NULL", "null", true},
-     {"TRUE", R"***(@t)***", true},
-     {"FALSE", R"***(@f)***", true},
-     {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
-     {"FLOAT", R"***(([0-9]+\.[0-9]*|[0-9]*\.[0-9]+))***"}, // "2.", ".5", ".2"=> OK, "."=>NG
-     {"INT", R"***([1-9][0-9]*)***"},
-     {"TYPE_INT", R"***(int)***", true},
-     {"TYPE_FLOAT", R"***(float)***", true},
-     {"TYPE_BOOL", R"***(bool)***", true},
-     {"PLUS", R"***(\+)***"},
-     {"MINUS", R"***(-)***"},
-     {"ASTERISK", R"***(\*)***"},
-     {"DIV_INT", R"***(//)***"},
-     {"SLASH", R"***(/)***"},
-     {"ANDAND", R"***(&&)***"},
-     {"AND", R"***(&)***"},
-     {"OROR", R"***(\|\|)***"},
-     {"OR", R"***(\|)***"},
-     {"HAT", R"***(^)***"},
-     {"NOT", R"***(not|\|)***"},
-     {"EQUAL", R"***(==)***"},
-     {"NOT_EQUAL", R"***(!=)***"},
-     {"LESS_EQUAL", R"***(<=)***"},
-     {"GREATER_EQUAL", R"***(>=)***"},
-     {"LEFT_ANGLE_BRACKET", R"***(<)***"},
-     {"RIGHT_ANGLE_BRACKET", R"***(>)***"},
-     {"LEFT_PAREN", R"***(\()***"},
-     {"RIGHT_PAREN", R"***(\))***"},
-     {"LEFT_BRACE", R"***(\{)***"},
-     {"RIGHT_BRACE", R"***(\})***"},
-     {"LEFT_BRACKET", R"***(\[)***"},
-     {"RIGHT_BRACKET", R"***(\])***"},
-     {"ASSIGN", R"***(=)***"},
-     {"IDENTIFIER", ""+IDENTIFIER_START_CHAR+IDENTIFIER_CHAR+"*"},
-  };
-}
-
 class SymbolDiscriminator{
 private:
   std::unordered_set<string> terminals, non_terminals;
@@ -149,3 +107,9 @@ public:
   const SyntaxDef& get_rule(int rule_id) const;
   int get_rule_id(const SyntaxDef &rule) const; //return -100 on not-found
 };
+
+namespace Syntax{
+  extern const std::vector<LexDef> tokens;
+  extern const std::vector<SyntaxDef> syntax_rules;
+  extern const std::shared_ptr<SyntaxDB> db;
+}

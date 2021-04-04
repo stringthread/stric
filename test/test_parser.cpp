@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "parser.h"
+#include "syntax.h"
 #include "lexer.h"
 #include "parser_gen.h"
 
@@ -18,17 +19,17 @@ public:
 
 TEST_F(ParserTest, ParseTest){
   //Expected output
-  AST_Node expect("main","",std::vector<AST_Node>({
-    AST_Node("ATOM","",std::vector<AST_Node>({
-      AST_Node("LEFT_PAREN","("),
-      AST_Node("ATOM","",std::vector<AST_Node>({
-        AST_Node("LEFT_PAREN","("),
-        AST_Node("ATOM","",std::vector<AST_Node>({
-          AST_Node("INT","12"),
+  AST_Node expect("main","",0,std::vector<AST_Node>({
+    AST_Node("ATOM","",2,std::vector<AST_Node>({
+      AST_Node("LEFT_PAREN","(",-2),
+      AST_Node("ATOM","",2,std::vector<AST_Node>({
+        AST_Node("LEFT_PAREN","(",-2),
+        AST_Node("ATOM","",1,std::vector<AST_Node>({
+          AST_Node("INT","12",-2),
         })),
-        AST_Node("RIGHT_PAREN",")"),
+        AST_Node("RIGHT_PAREN",")",-2),
       })),
-      AST_Node("RIGHT_PAREN",")"),
+      AST_Node("RIGHT_PAREN",")",-2),
     })),
   }));
   // Actual process
@@ -38,8 +39,7 @@ TEST_F(ParserTest, ParseTest){
   Parser parser(lex, db, parsing_table);
   AST_Node result=parser.parse("((12))");
   // Assertions
-  std::cout << result.str() << '\n';
-  EXPECT_EQ(result, expect);
+  EXPECT_EQ(result, expect)<< result.str();
 }
 
 class ComplexedSyntaxTest : public ::testing::Test {
@@ -60,38 +60,38 @@ public:
 
 TEST_F(ComplexedSyntaxTest, ParseTest){
   //Expected output
-  AST_Node expect("main","",std::vector<AST_Node>({
-    AST_Node("TERM","",std::vector<AST_Node>({
-      AST_Node("TERM","",std::vector<AST_Node>({
-        AST_Node("ATOM","",std::vector<AST_Node>({
-          AST_Node("LEFT_PAREN","("),
-          AST_Node("main","",std::vector<AST_Node>({
-            AST_Node("main","",std::vector<AST_Node>({
-              AST_Node("TERM","",std::vector<AST_Node>({
-                AST_Node("ATOM","",std::vector<AST_Node>({
-                  AST_Node("INT","11"),
+  AST_Node expect("main","",1,std::vector<AST_Node>({
+    AST_Node("TERM","",2,std::vector<AST_Node>({
+      AST_Node("TERM","",3,std::vector<AST_Node>({
+        AST_Node("ATOM","",5,std::vector<AST_Node>({
+          AST_Node("LEFT_PAREN","(",-2),
+          AST_Node("main","",0,std::vector<AST_Node>({
+            AST_Node("main","",1,std::vector<AST_Node>({
+              AST_Node("TERM","",3,std::vector<AST_Node>({
+                AST_Node("ATOM","",4,std::vector<AST_Node>({
+                  AST_Node("INT","11",-2),
                 })),
               })),
             })),
-            AST_Node("PLUS","+"),
-            AST_Node("TERM","",std::vector<AST_Node>({
-              AST_Node("TERM","",std::vector<AST_Node>({
-                AST_Node("ATOM","",std::vector<AST_Node>({
-                  AST_Node("INT","3"),
+            AST_Node("PLUS","+",-2),
+            AST_Node("TERM","",2,std::vector<AST_Node>({
+              AST_Node("TERM","",3,std::vector<AST_Node>({
+                AST_Node("ATOM","",4,std::vector<AST_Node>({
+                  AST_Node("INT","3",-2),
                 })),
               })),
-              AST_Node("ASTERISK","*"),
-              AST_Node("ATOM","",std::vector<AST_Node>({
-                AST_Node("INT","2"),
+              AST_Node("ASTERISK","*",-2),
+              AST_Node("ATOM","",4,std::vector<AST_Node>({
+                AST_Node("INT","2",-2),
               })),
             })),
           })),
-          AST_Node("RIGHT_PAREN",")"),
+          AST_Node("RIGHT_PAREN",")",-2),
         })),
       })),
-      AST_Node("ASTERISK","*"),
-      AST_Node("ATOM","",std::vector<AST_Node>({
-        AST_Node("INT","3"),
+      AST_Node("ASTERISK","*",-2),
+      AST_Node("ATOM","",4,std::vector<AST_Node>({
+        AST_Node("INT","3",-2),
       })),
     })),
   }));
@@ -102,6 +102,5 @@ TEST_F(ComplexedSyntaxTest, ParseTest){
   Parser parser(lex, db, parsing_table);
   AST_Node result=parser.parse("(11+3*2)*3");
   // Assertions
-  std::cout << result.str() << '\n';
-  EXPECT_EQ(result, expect);
+  EXPECT_EQ(result, expect)<< result.str();
 }
