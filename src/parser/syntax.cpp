@@ -45,9 +45,9 @@ const std::vector<LexDef> Syntax::tokens {
 const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"main", std::vector<string>({"main","block"})},
   {"main", std::vector<string>({"block"})},
-  {"block", std::vector<string>({"statement"})},
-  {"statement", std::vector<string>({"value_expr","EOS"})},
-  // add if, while ... to statement
+  {"block", std::vector<string>({"sentence"})},
+  {"sentence", std::vector<string>({"value_expr","EOS"})},
+  // add if, while ... to sentence
   {"atom_value", std::vector<string>({"IDENTIFIER"})},
   {"atom_value", std::vector<string>({"literal"})},
   {"literal", std::vector<string>({"NULL"})},
