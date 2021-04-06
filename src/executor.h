@@ -21,6 +21,7 @@ private:
   static std::unordered_set<string> operator_symbols; //non-terminates
   static std::unordered_set<string> operator_terminals; //terminals
   static std::unordered_map<string, exec_func_t> control_exec; //ControlTokenName->function
+  static const string& get_tokenname_from_AST(const AST_Node &node);
   std::unordered_map<string, obj_ptr_t> vars;
   void init();
 public:

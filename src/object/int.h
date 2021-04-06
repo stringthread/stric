@@ -9,10 +9,10 @@ class INT: public Object{
 private:
   int val;
   static std::unordered_map<string, std::function<int(obj_ptr_t)>> cast_fn;
-  static op_func_map_t op_func_def;
+  static std::shared_ptr<op_func_map_t> op_func_def;
   static int val_cast(obj_ptr_t obj);
   INT(int val):val(val){
-    operators=std::shared_ptr<op_func_map_t>(&(INT::op_func_def));
+    operators=INT::op_func_def;
   }
 public:
   string type() const override{ return "INT"; };

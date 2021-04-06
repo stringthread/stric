@@ -22,7 +22,7 @@ std::shared_ptr<INT> INT::cast(obj_ptr_t obj){
 std::unordered_map<string, std::function<int(obj_ptr_t)>> INT::cast_fn {
   {"INT", [](obj_ptr_t obj){return std::static_pointer_cast<INT>(obj)->val;}},
 };
-op_func_map_t INT::op_func_def {
+std::shared_ptr<op_func_map_t> INT::op_func_def=std::shared_ptr<op_func_map_t>(new op_func_map_t({
   {"PLUS",
     op_func_map_2_t({
       {1, op_func_map_1_t({
@@ -41,12 +41,13 @@ op_func_map_t INT::op_func_def {
       })},
     }),
   },
-};
+}));
 void INT::init(){
   generators["INT"]=[](const string &val){
     return INT::generate(val);
   };
   casters["INT"]=[](obj_ptr_t obj){
+    std::cout << "casted" << '\n';
     return INT::cast(obj);
   };
 }

@@ -16,7 +16,13 @@ std::unordered_set<string> Executor::operator_terminals{
   "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
   "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN",
 };
-std::unordered_map<string, exec_func_t> Executor::control_exec;
+std::unordered_map<string, exec_func_t> Executor::control_exec{
+  {"PLUS", OPERATORS::unary_plus},
+};
+const string& Executor::get_tokenname_from_AST(const AST_Node &node){
+  if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
+  return node.type;
+}
 Executor::Executor(){
   Object::init();
 }
@@ -32,9 +38,8 @@ obj_ptr_t Executor::eval(const AST_Node &node){
     }
   }
   else if(node.type=="sentence"){
-    for(const auto &expr : node.children){
-      std::cout << "expr" << '\n'; // hangs when deleted
-      const auto result=eval(expr);
+    for(int i=0;i<node.children.size();i++){
+      const auto result=eval(node.children[i]);
       if(result) std::cout << result->print() << std::endl;
     }
   }
@@ -58,8 +63,8 @@ obj_ptr_t Executor::eval(const AST_Node &node){
           throw std::runtime_error("Node without control token...");
           return nullptr;
         }
-        if(!std::dynamic_pointer_cast<OPERATORS>(eval(*itr_control))) std::cout << "non-op : " << itr_control->value << '\n';
-        const string& type_control=std::dynamic_pointer_cast<OPERATORS>(eval(*itr_control))->type();
+        if(operator_symbols.count(itr_control->type)==0) std::cout << "non-op : " << itr_control->value << '\n';
+        const string& type_control=get_tokenname_from_AST(*itr_control);
         size_t pos_control=std::distance(node.children.cbegin(),itr_control);
         if(pos_control!=0){
           std::vector<obj_ptr_t> v_obj;
@@ -85,8 +90,8 @@ obj_ptr_t Executor::get_var(const string &name){
   }
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name){
-  vars[name]=(Object::casters.at(type))(nullptr);
+  return vars[name]=(Object::casters.at(type))(nullptr);
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name, obj_ptr_t value){
-  vars[name]=(Object::casters.at(name))(value);
+  return vars[name]=(Object::casters.at(name))(value);
 }
