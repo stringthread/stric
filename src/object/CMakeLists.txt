@@ -4,5 +4,6 @@ project(stric_object CXX)
 add_library(object STATIC
   object.cpp
   int.cpp
+  bool.cpp
   operators.cpp
 )

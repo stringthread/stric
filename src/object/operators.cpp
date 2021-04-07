@@ -20,3 +20,13 @@ obj_ptr_t OPERATORS::unary_plus(Executor *p_exec, const std::vector<AST_Node>& a
   }
   return (v_obj[1]->operators().at("PLUS").at(0).at(2))(v_obj);
 }
+obj_ptr_t OPERATORS::_not(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=2){
+    throw std::invalid_argument("wrong length arguments for not");
+  }
+  std::vector<obj_ptr_t> v_obj;
+  for(const auto &elem : args){
+    v_obj.push_back(p_exec->eval(elem));
+  }
+  return (v_obj[1]->operators().at("NOT").at(0).at(2))(v_obj);
+}

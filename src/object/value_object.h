@@ -23,8 +23,8 @@ public:
   //void Derived::set(obj_ptr_t new_val) override;
   virtual void set(T new_val)=0;
   T get_val() const { return val; }
-  virtual std::unordered_map<string, std::function<T(obj_ptr_t)>>& get_cast_fn() const=0;
-  //op_func_map_t& Derived::operators() const override;
+  virtual std::unordered_map<string, std::function<T(obj_ptr_t)>>& get_cast_fn() const=0;// { return cast_fn; }
+  //op_func_map_t& Derived::operators() const override { return op_func_def; }
   //string Derived::print() const override;
 };
 

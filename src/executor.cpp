@@ -18,6 +18,7 @@ std::unordered_set<string> Executor::operator_terminals{
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
+  {"NOT", OPERATORS::_not},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
