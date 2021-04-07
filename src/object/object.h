@@ -19,7 +19,7 @@ class Object{
 public:
   static std::unordered_map<string, std::function<obj_ptr_t(const string&)>> generators;
   static std::unordered_map<string, std::function<obj_ptr_t(obj_ptr_t)>> casters;
-  std::shared_ptr<op_func_map_t> operators; //[operator token][op_pos(0-)][size]->fn
+  virtual op_func_map_t& operators() const=0; //[operator token][op_pos(0-)][size]->fn
   static void init();
   static bool is_obj(const string &token);
   virtual string type() const=0;

@@ -71,7 +71,7 @@ obj_ptr_t Executor::eval(const AST_Node &node){
           for(const auto &child : node.children){
             v_obj.push_back(eval(child));
           }
-          return (v_obj[0]->operators->at(type_control).at(pos_control).at(node.children.size()))(v_obj);
+          return (v_obj[0]->operators().at(type_control).at(pos_control).at(node.children.size()))(v_obj);
         }
         return (control_exec.at(type_control))(this, node.children);
     }
