@@ -1,6 +1,7 @@
 #include "executor.h"
 #include "object/object.h"
 #include "object/operators.h"
+#include "controls.h"
 
 std::unordered_set<string> Executor::operator_symbols {
   "suffix_unary_operator",
@@ -14,11 +15,13 @@ std::unordered_set<string> Executor::operator_terminals{
   "ANDAND", "AND", "OROR", "OR", "HAT", "NOT", "EQUAL", "NOT_EQUAL",
   "LESS_EQUAL", "GREATER_EQUAL", "LEFT_ANGLE_BRACKET", "RIGHT_ANGLE_BRACKET",
   "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
-  "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN",
+  "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN", "IF",
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
   {"NOT", OPERATORS::_not},
+  {"LEFT_PAREN", OPERATORS::left_paren},
+  {"IF", CONTROLS::_if},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
@@ -61,10 +64,10 @@ obj_ptr_t Executor::eval(const AST_Node &node){
           return operator_symbols.count(i.type)!=0||control_exec.count(i.type)!=0;
         });
         if(itr_control==node.children.cend()){
+          std::cout << "at evaluating :" << node.type << '\n';
           throw std::runtime_error("Node without control token...");
           return nullptr;
         }
-        if(operator_symbols.count(itr_control->type)==0) std::cout << "non-op : " << itr_control->value << '\n';
         const string& type_control=get_tokenname_from_AST(*itr_control);
         size_t pos_control=std::distance(node.children.cbegin(),itr_control);
         if(pos_control!=0){

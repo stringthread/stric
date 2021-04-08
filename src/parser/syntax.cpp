@@ -6,6 +6,7 @@ const std::vector<LexDef> Syntax::tokens {
    {"EOS", R"***(;)***"},
    {"COMMA", R"***(,)***"},
    {"NULL", "null", true},
+   {"IF", "if", true},
    {"TRUE", R"***(@t)***", true},
    {"FALSE", R"***(@f)***", true},
    {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
@@ -47,7 +48,9 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"main", std::vector<string>({"block"})},
   {"block", std::vector<string>({"sentence"})},
   {"sentence", std::vector<string>({"value_expr","EOS"})},
-  // add if, while ... to sentence
+  {"sentence", std::vector<string>({"if_statement"})},
+  {"if_statement", std::vector<string>({"IF","atom_value","block"})},
+  // add while ... to sentence
   {"atom_value", std::vector<string>({"IDENTIFIER"})},
   {"atom_value", std::vector<string>({"literal"})},
   {"literal", std::vector<string>({"NULL"})},

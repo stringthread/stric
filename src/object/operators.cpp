@@ -26,6 +26,12 @@ obj_ptr_t OPERATORS::_not(Executor *p_exec, const std::vector<AST_Node>& args){
   }
   return (v_obj[1]->operators().at("NOT").at(0).at(2))(v_obj);
 }
+obj_ptr_t OPERATORS::left_paren(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=3){
+    throw std::invalid_argument("wrong length arguments for not");
+  }
+  return p_exec->eval(args[1]);
+}
 
 obj_ptr_t OperatorsFactory::generate(const string& val){
   return std::shared_ptr<OPERATORS>(new OPERATORS(val));
