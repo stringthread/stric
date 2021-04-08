@@ -2,22 +2,24 @@
 
 #include "value_object.h"
 
+class IntUtil : public ValueObjectUtil<int>{
+private:
+  static std::unordered_map<string, std::function<int(obj_ptr_t)>> cast_fn;//from->fn
+public:
+  int obj2val_cast(obj_ptr_t obj) const override;
+  int val_cast(const string& val) const override;
+  string to_str(const int& val) const override;
+};
+
 class INT : public ValueObject<int>{
 private:
-  INT(int val) : ValueObject<int>(val){}
-  static std::unordered_map<string, std::function<int(obj_ptr_t)>> cast_fn;//from->fn
+  INT(int val) : ValueObject<int>(val,util){}
+  static IntUtil util;
+  static std::shared_ptr<ValueObjectFactory<INT, int>> factory;
   static op_func_map_t op_func_def;
-  static int obj2val_cast(obj_ptr_t obj);
-  static int val_cast(const string& val);
-  static obj_ptr_t generate(const string &val);
-  static obj_ptr_t cast(obj_ptr_t obj);
 public:
+  friend ValueObjectFactory<INT, int>;
   string type() const override{ return "INT"; }
-  std::unordered_map<string, std::function<int(obj_ptr_t)>>& get_cast_fn() const override {
-    return cast_fn;
-  }
-  void set(obj_ptr_t new_val) override;
-  void set(int new_val) override;
   op_func_map_t& operators() const override {
     return op_func_def;
   }

@@ -47,13 +47,13 @@ obj_ptr_t Executor::eval(const AST_Node &node){
   else if(node.type=="EOS"){
   }
   else if(operator_terminals.count(node.type)!=0){
-    return OPERATORS::generate(node.type);
+    return Object::factories["OPERATORS"]->generate(node.type);
   }
   else{
     switch(node.children.size()){
       case 0:
         if(node.type=="IDENTIFIER") return get_var(node.value);
-        return (Object::generators.at(node.type))(node.value);
+        return Object::factories.at(node.type)->generate(node.value);
       case 1:
         return eval(node.children[0]);
       default:
@@ -91,8 +91,8 @@ obj_ptr_t Executor::get_var(const string &name){
   }
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name){
-  return vars[name]=(Object::casters.at(type))(nullptr);
+  return vars[name]=Object::factories.at(type)->cast(nullptr);
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name, obj_ptr_t value){
-  return vars[name]=(Object::casters.at(name))(value);
+  return vars[name]=Object::factories.at(name)->cast(value);
 }

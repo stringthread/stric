@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include "../parser/parser.h"
 #include "../parser/syntax.h"
@@ -15,10 +16,15 @@ using op_func_map_1_t=std::unordered_map<int,op_func_t>;
 using op_func_map_2_t=std::unordered_map<int,op_func_map_1_t>;
 using op_func_map_t=std::unordered_map<string,op_func_map_2_t>;
 
+class ObjectFactory{
+public:
+  virtual obj_ptr_t generate(const string&)=0;
+  virtual obj_ptr_t cast(obj_ptr_t)=0;
+};
+
 class Object{
 public:
-  static std::unordered_map<string, std::function<obj_ptr_t(const string&)>> generators;
-  static std::unordered_map<string, std::function<obj_ptr_t(obj_ptr_t)>> casters;
+  static std::unordered_map<string, std::shared_ptr<ObjectFactory>> factories;
   virtual op_func_map_t& operators() const=0; //[operator token][op_pos(0-)][size]->fn
   static void init();
   static bool is_obj(const string &token);

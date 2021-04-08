@@ -3,13 +3,12 @@
 #include "bool.h"
 #include "operators.h"
 
-std::unordered_map<string, std::function<obj_ptr_t(const string&)>> Object::generators;
-std::unordered_map<string, std::function<obj_ptr_t(obj_ptr_t)>> Object::casters;
+std::unordered_map<string, std::shared_ptr<ObjectFactory>> Object::factories;
 void Object::init(){
   INT::init();
   BOOL::init();
   OPERATORS::init();
 }
 bool Object::is_obj(const string &token){
-  return generators.count(token)!=0;
+  return factories.count(token)!=0;
 }

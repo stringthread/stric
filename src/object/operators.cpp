@@ -2,13 +2,9 @@
 #include "../executor.h"
 #include <stdexcept>
 
-std::shared_ptr<OPERATORS> OPERATORS::generate(const string &val){
-  return std::shared_ptr<OPERATORS>(new OPERATORS(val));
-}
+std::shared_ptr<OperatorsFactory> OPERATORS::factory=std::make_shared<OperatorsFactory>();
 void OPERATORS::init(){
-  generators["OPERATORS"]=[](const string &val){
-    return OPERATORS::generate(val);
-  };
+  factories["OPERATORS"]=factory;
 }
 obj_ptr_t OPERATORS::unary_plus(Executor *p_exec, const std::vector<AST_Node>& args){
   if(args.size()!=2){
@@ -29,4 +25,11 @@ obj_ptr_t OPERATORS::_not(Executor *p_exec, const std::vector<AST_Node>& args){
     v_obj.push_back(p_exec->eval(elem));
   }
   return (v_obj[1]->operators().at("NOT").at(0).at(2))(v_obj);
+}
+
+obj_ptr_t OperatorsFactory::generate(const string& val){
+  return std::shared_ptr<OPERATORS>(new OPERATORS(val));
+}
+obj_ptr_t OperatorsFactory::cast(obj_ptr_t obj){
+  return nullptr;
 }
