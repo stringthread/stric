@@ -30,6 +30,28 @@ op_func_map_t BOOL::op_func_def={
       })},
     }),
   },
+  {"ANDAND",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate_from_val(std::dynamic_pointer_cast<BOOL>(v_obj[0])->get_val()&&std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"OROR",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate_from_val(std::dynamic_pointer_cast<BOOL>(v_obj[0])->get_val()||std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
 };
 void BOOL::init(){
   _init("TRUE", factory);

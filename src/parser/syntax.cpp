@@ -7,6 +7,7 @@ const std::vector<LexDef> Syntax::tokens {
    {"COMMA", R"***(,)***"},
    {"NULL", "null", true},
    {"IF", "if", true},
+   {"ELSE", "else", true},
    {"TRUE", R"***(@t)***", true},
    {"FALSE", R"***(@f)***", true},
    {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
@@ -47,9 +48,13 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"main", std::vector<string>({"main","block"})},
   {"main", std::vector<string>({"block"})},
   {"block", std::vector<string>({"sentence"})},
+  {"block", std::vector<string>({"block","sentence"})},
+  {"block", std::vector<string>({"LEFT_BRACE","block","RIGHT_BRACE"})},
   {"sentence", std::vector<string>({"value_expr","EOS"})},
   {"sentence", std::vector<string>({"if_statement"})},
+  {"sentence", std::vector<string>({"if_else_statement"})},
   {"if_statement", std::vector<string>({"IF","atom_value","block"})},
+  {"if_else_statement", std::vector<string>({"if_statement","ELSE","block"})},
   // add while ... to sentence
   {"atom_value", std::vector<string>({"IDENTIFIER"})},
   {"atom_value", std::vector<string>({"literal"})},
@@ -84,8 +89,12 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"assign_operator", std::vector<string>({"ASSIGN"})},
   /*{"binary_operator_3", std::vector<string>({"math_operator_1","ASSIGN"})},
   {"binary_operator_3", std::vector<string>({"math_operator_2","ASSIGN"})},*/
-  {"value_expr", std::vector<string>({"term_5"})},
-  {"atom_value", std::vector<string>({"LEFT_PAREN","term_5","RIGHT_PAREN"})},
+  {"term_6", std::vector<string>({"term_5"})},
+  {"term_6", std::vector<string>({"term_5","bool_operator","term_6"})},
+  {"bool_operator", std::vector<string>({"ANDAND"})},
+  {"bool_operator", std::vector<string>({"OROR"})},
+  {"value_expr", std::vector<string>({"term_6"})},
+  {"atom_value", std::vector<string>({"LEFT_PAREN","term_6","RIGHT_PAREN"})},
 };
 const std::shared_ptr<SyntaxDB> Syntax::db=std::make_shared<SyntaxDB>(syntax_rules);
 

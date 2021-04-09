@@ -37,6 +37,46 @@ op_func_map_t INT::op_func_def={
       })},
     }),
   },
+  {"MINUS",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()-std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+          }
+        },
+      })},
+      {0, op_func_map_1_t({
+        {2,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate_from_val(-util.obj2val_cast(v_obj[1]));
+          }
+        },
+      })},
+    }),
+  },
+  {"ASTERISK",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()*std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+          }
+        },
+      })},
+    }),
+  },
+  {"DIV_INT",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()/std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+          }
+        },
+      })},
+    }),
+  },
 };
 void INT::init(){
   _init("INT", factory);

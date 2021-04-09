@@ -9,19 +9,21 @@ std::unordered_set<string> Executor::operator_symbols {
   "math_operator_1",
   "math_operator_2",
   "assign_operator",
+  "bool_operator",
 };
 std::unordered_set<string> Executor::operator_terminals{
   "PLUSPLUS", "PLUS", "MINUSMINUS", "MINUS", "ASTERISK", "DIV_INT", "SLASH",
   "ANDAND", "AND", "OROR", "OR", "HAT", "NOT", "EQUAL", "NOT_EQUAL",
   "LESS_EQUAL", "GREATER_EQUAL", "LEFT_ANGLE_BRACKET", "RIGHT_ANGLE_BRACKET",
   "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
-  "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN", "IF",
+  "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN", "IF", "ELSE",
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
   {"NOT", OPERATORS::_not},
   {"LEFT_PAREN", OPERATORS::left_paren},
   {"IF", CONTROLS::_if},
+  {"ELSE", CONTROLS::_if_else},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
@@ -70,7 +72,7 @@ obj_ptr_t Executor::eval(const AST_Node &node){
         }
         const string& type_control=get_tokenname_from_AST(*itr_control);
         size_t pos_control=std::distance(node.children.cbegin(),itr_control);
-        if(pos_control!=0){
+        if(operator_terminals.count(type_control)!=0&&pos_control!=0){
           std::vector<obj_ptr_t> v_obj;
           for(const auto &child : node.children){
             v_obj.push_back(eval(child));
