@@ -9,6 +9,12 @@ add_executable(parse
 target_link_libraries(parse
   parser
 )
+add_executable(lex
+  lex.cpp
+)
+target_link_libraries(lex
+  parser
+)
 add_executable(main
   main.cpp
   executor.cpp

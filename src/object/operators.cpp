@@ -28,9 +28,20 @@ obj_ptr_t OPERATORS::_not(Executor *p_exec, const std::vector<AST_Node>& args){
 }
 obj_ptr_t OPERATORS::left_paren(Executor *p_exec, const std::vector<AST_Node>& args){
   if(args.size()!=3){
-    throw std::invalid_argument("wrong length arguments for not");
+    throw std::invalid_argument("wrong length arguments for parens");
   }
   return p_exec->eval(args[1]);
+}
+obj_ptr_t OPERATORS::assign(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=3){
+    throw std::invalid_argument("wrong length arguments for assign");
+  }
+  auto assigned=p_exec->eval(args[0]);
+  if(!assigned){
+    throw std::runtime_error("cannot assign to null");
+  }
+  assigned->set(p_exec->eval(args[2]));
+  return assigned;
 }
 
 obj_ptr_t OperatorsFactory::generate(const string& val){

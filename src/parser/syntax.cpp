@@ -5,21 +5,21 @@ const std::vector<LexDef> Syntax::tokens {
    {"", R"***(\r?\n)***"}, // EOL: ignore
    {"EOS", R"***(;)***"},
    {"COMMA", R"***(,)***"},
-   {"NULL", "null", true},
-   {"IF", "if", true},
-   {"ELSE", "else", true},
+   {"DOT", R"***(\.)***"},
+   {"NULL", R"***(null)***", true},
+   {"IF", R"***(if)***", true},
+   {"ELSE", R"***(else)***", true},
+   {"VAR_DEF", R"***(var)***", true},
    {"TRUE", R"***(@t)***", true},
    {"FALSE", R"***(@f)***", true},
    {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
    {"FLOAT", R"***(([0-9]+\.[0-9]*|[0-9]*\.[0-9]+))***"}, // "2.", ".5", ".2"=> OK, "."=>NG
    {"INT", R"***([1-9][0-9]*)***"},
-   {"TYPE_INT", R"***(int)***", true},
-   {"TYPE_FLOAT", R"***(float)***", true},
-   {"TYPE_BOOL", R"***(bool)***", true},
    {"PLUSPLUS", R"***(\+\+)***"},
    {"PLUS", R"***(\+)***"},
    {"MINUSMINUS", R"***(--)***"},
    {"MINUS", R"***(-)***"},
+   {"ASTAST", R"***(\*\*)***"},
    {"ASTERISK", R"***(\*)***"},
    {"DIV_INT", R"***(//)***"},
    {"SLASH", R"***(/)***"},
@@ -55,7 +55,8 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"if_statement", std::vector<string>({"IF","atom_value","block"})},
   {"if_else_statement", std::vector<string>({"if_statement","ELSE","block"})},
   // add while ... to sentence
-  {"atom_value", std::vector<string>({"IDENTIFIER"})},
+  {"atom_value", std::vector<string>({"DOT","IDENTIFIER"})},
+  {"atom_value", std::vector<string>({"atom_value","DOT","IDENTIFIER"})},
   {"atom_value", std::vector<string>({"literal"})},
   {"literal", std::vector<string>({"NULL"})},
   {"literal", std::vector<string>({"TRUE"})},
@@ -84,7 +85,10 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"math_operator_2", std::vector<string>({"PLUS"})},
   {"math_operator_2", std::vector<string>({"MINUS"})},
   {"term_5", std::vector<string>({"term_4"})},
-  {"term_5", std::vector<string>({"term_4","assign_operator","term_5"})},
+  {"term_5", std::vector<string>({"term_5","assign_operator","term_5"})},
+  //{"type", std::vector<string>({"IDENTIFIER"})},
+  {"var_def", std::vector<string>({/*"VAR_DEF",*/"IDENTIFIER","IDENTIFIER"})},
+  {"term_5", std::vector<string>({"var_def"})},
   {"assign_operator", std::vector<string>({"ASSIGN"})},
   /*{"binary_operator_3", std::vector<string>({"math_operator_1","ASSIGN"})},
   {"binary_operator_3", std::vector<string>({"math_operator_2","ASSIGN"})},*/
@@ -99,7 +103,7 @@ const std::shared_ptr<SyntaxDB> Syntax::db=std::make_shared<SyntaxDB>(syntax_rul
 
 string LexDef::format_regex(string& arg_ptn, bool flg_force_end){
   arg_ptn="^"+arg_ptn;
-  if(flg_force_end) arg_ptn+="(?!"+Syntax::IDENTIFIER_CHAR+"})";
+  if(flg_force_end) arg_ptn+="(?!"+Syntax::IDENTIFIER_CHAR+")";
   return arg_ptn;
 }
 

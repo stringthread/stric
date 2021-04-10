@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 
-#include "parser/parser.h"
+#include "parser/lexer.h"
 #include "parser/syntax.h"
 
 using std::string;
@@ -19,8 +19,10 @@ int main(int argc, char *argv[]){
     }
     code=string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
   }
-  Parser parser=Parser::create();
-  AST_Node result=parser.parse(code);
-  std::cout << result.str() << '\n';
+  Lexer lex;
+  const auto& result=lex.analize(code);
+  for(const auto& result_token : result){
+    std::cout << (string)result_token << '\n';
+  }
   return 0;
 }

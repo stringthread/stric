@@ -28,4 +28,5 @@ public:
   static obj_ptr_t unary_plus(Executor *p_exec, const std::vector<AST_Node>& args);
   static obj_ptr_t _not(Executor *p_exec, const std::vector<AST_Node>& args);
   static obj_ptr_t left_paren(Executor *p_exec, const std::vector<AST_Node>& args);
+  static obj_ptr_t assign(Executor *p_exec, const std::vector<AST_Node>& args);
 };

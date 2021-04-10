@@ -7,8 +7,13 @@
 //abstract
 template<typename T>
 class ValueObjectUtil{
+protected:
+  virtual T get_default() const=0;
+  virtual T _obj2val_cast(obj_ptr_t) const=0;
 public:
-  virtual T obj2val_cast(obj_ptr_t) const=0;
+  virtual T obj2val_cast(obj_ptr_t obj) const{
+    return obj?_obj2val_cast(obj):get_default();
+  }
   virtual T val_cast(const string&) const=0;
   virtual string to_str(const T&) const=0;
 };

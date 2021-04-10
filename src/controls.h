@@ -29,4 +29,14 @@ namespace CONTROLS{
     }
     return nullptr;
   }
+  obj_ptr_t dot(Executor *p_exec, const std::vector<AST_Node>& args){
+    if(args.size()!=2){
+      throw std::invalid_argument("wrong length arguments for dot");
+    }
+    try{
+      return p_exec->get_var(args[1].value);
+    }catch(std::out_of_range){
+      throw std::invalid_argument("undefined identifier (at var) : "+args[1].value);
+    }
+  }
 }

@@ -3,7 +3,8 @@
 std::unordered_map<string, std::function<bool(obj_ptr_t)>> BoolUtil::cast_fn {
   {"BOOL", [](obj_ptr_t obj){return std::static_pointer_cast<BOOL>(obj)->get_val();}},
 };
-bool BoolUtil::obj2val_cast(obj_ptr_t obj) const {
+bool BoolUtil::_obj2val_cast(obj_ptr_t obj) const {
+  if(!obj) return get_default();
   if(obj->type()=="BOOL") return std::static_pointer_cast<BOOL>(obj)->get_val();
   if(cast_fn.count(obj->type())==0){
     throw std::runtime_error("Cast failed to BOOL : "+obj->type());
@@ -56,4 +57,5 @@ op_func_map_t BOOL::op_func_def={
 void BOOL::init(){
   _init("TRUE", factory);
   _init("FALSE", factory);
+  _init("BOOL", factory);
 }

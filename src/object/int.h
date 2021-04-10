@@ -4,9 +4,10 @@
 
 class IntUtil : public ValueObjectUtil<int>{
 private:
+  int get_default() const override { return 0; };
+  int _obj2val_cast(obj_ptr_t obj) const override;
   static std::unordered_map<string, std::function<int(obj_ptr_t)>> cast_fn;//from->fn
 public:
-  int obj2val_cast(obj_ptr_t obj) const override;
   int val_cast(const string& val) const override;
   string to_str(const int& val) const override;
 };

@@ -3,7 +3,8 @@
 std::unordered_map<string, std::function<int(obj_ptr_t)>> IntUtil::cast_fn {
   {"INT", [](obj_ptr_t obj){return std::static_pointer_cast<INT>(obj)->get_val();}},
 };
-int IntUtil::obj2val_cast(obj_ptr_t obj) const {
+int IntUtil::_obj2val_cast(obj_ptr_t obj) const {
+  if(!obj) return get_default();
   if(obj->type()=="INT") return std::static_pointer_cast<INT>(obj)->get_val();
   if(cast_fn.count(obj->type())==0){
     throw std::runtime_error("Cast failed to INT : "+obj->type());

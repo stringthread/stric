@@ -29,6 +29,5 @@ public:
   obj_ptr_t eval(const AST_Node &node);
   void add_exec(const string &token, exec_func_t func);
   obj_ptr_t get_var(const string &name);
-  obj_ptr_t def_var(const string &type, const string &name);
-  obj_ptr_t def_var(const string &type, const string &name, obj_ptr_t value);
+  obj_ptr_t def_var(const string &type, const string &name, obj_ptr_t value=nullptr);
 };

@@ -3,6 +3,8 @@
 #include "object/operators.h"
 #include "controls.h"
 
+#include <stdexcept>
+
 std::unordered_set<string> Executor::operator_symbols {
   "suffix_unary_operator",
   "prefix_unary_operator",
@@ -16,7 +18,7 @@ std::unordered_set<string> Executor::operator_terminals{
   "ANDAND", "AND", "OROR", "OR", "HAT", "NOT", "EQUAL", "NOT_EQUAL",
   "LESS_EQUAL", "GREATER_EQUAL", "LEFT_ANGLE_BRACKET", "RIGHT_ANGLE_BRACKET",
   "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
-  "LEFT_BRACKET", "RIGHT_BRACKET", "ASSIGN", "IF", "ELSE",
+  "LEFT_BRACKET", "RIGHT_BRACKET",
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
@@ -24,6 +26,8 @@ std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"LEFT_PAREN", OPERATORS::left_paren},
   {"IF", CONTROLS::_if},
   {"ELSE", CONTROLS::_if_else},
+  {"ASSIGN", OPERATORS::assign},
+  {"DOT", CONTROLS::dot},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
@@ -50,6 +54,15 @@ obj_ptr_t Executor::eval(const AST_Node &node){
     }
   }
   else if(node.type=="EOS"){
+  }
+  else if(node.type=="var_def"){
+    if(node.children.size()!=2){
+      throw std::runtime_error("invalid children size : var_def");
+      return nullptr;
+    }
+    auto var=def_var(node.children[0].value, node.children[1].value);//only for simple type
+    if(!var) std::cout << "null after def_var" << '\n';
+    return var;
   }
   else if(operator_terminals.count(node.type)!=0){
     return Object::factories["OPERATORS"]->generate(node.type);
@@ -95,9 +108,10 @@ obj_ptr_t Executor::get_var(const string &name){
     throw;
   }
 }
-obj_ptr_t Executor::def_var(const string &type, const string &name){
-  return vars[name]=Object::factories.at(type)->cast(nullptr);
-}
 obj_ptr_t Executor::def_var(const string &type, const string &name, obj_ptr_t value){
-  return vars[name]=Object::factories.at(name)->cast(value);
+  if(Object::factories.count(type)==0){
+    throw std::runtime_error("invalid typename for defining var : "+type);
+  }
+  vars[name]=Object::factories.at(type)->cast(value);
+  return vars[name];
 }

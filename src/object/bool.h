@@ -4,9 +4,10 @@
 
 class BoolUtil : public ValueObjectUtil<bool>{
 private:
+  bool get_default() const override { return false; };
+  bool _obj2val_cast(obj_ptr_t) const override;
   static std::unordered_map<string, std::function<bool(obj_ptr_t)>> cast_fn;
 public:
-  bool obj2val_cast(obj_ptr_t) const override;
   bool val_cast(const string&) const override;
   string to_str(const bool&) const override;
 };
