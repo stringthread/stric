@@ -14,7 +14,7 @@ const std::vector<LexDef> Syntax::tokens {
    {"FALSE", R"***(@f)***", true},
    {"HEX_INT", R"***(0x[1-9a-fA-F][0-9a-fA-F]*)***"},
    {"FLOAT", R"***(([0-9]+\.[0-9]*|[0-9]*\.[0-9]+))***"}, // "2.", ".5", ".2"=> OK, "."=>NG
-   {"INT", R"***([1-9][0-9]*)***"},
+   {"INT", R"***(([1-9][0-9]*|0))***"},
    {"PLUSPLUS", R"***(\+\+)***"},
    {"PLUS", R"***(\+)***"},
    {"MINUSMINUS", R"***(--)***"},
@@ -27,10 +27,11 @@ const std::vector<LexDef> Syntax::tokens {
    {"AND", R"***(&)***"},
    {"OROR", R"***(\|\|)***"},
    {"OR", R"***(\|)***"},
-   {"HAT", R"***(^)***"},
-   {"NOT", R"***(not|!)***"},
+   {"HAT", R"***(\^)***"},
    {"EQUAL", R"***(==)***"},
-   {"NOT_EQUAL", R"***(!=)***"},
+   {"NOT_EQUAL", R"***(\!=)***"},
+   {"NOT", R"***(\!)***"},
+   {"NOT", R"***(not)***",true},
    {"LESS_EQUAL", R"***(<=)***"},
    {"GREATER_EQUAL", R"***(>=)***"},
    {"LEFT_ANGLE_BRACKET", R"***(<)***"},
@@ -102,7 +103,7 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
 const std::shared_ptr<SyntaxDB> Syntax::db=std::make_shared<SyntaxDB>(syntax_rules);
 
 string LexDef::format_regex(string& arg_ptn, bool flg_force_end){
-  arg_ptn="^"+arg_ptn;
+  arg_ptn=string("^")+arg_ptn;
   if(flg_force_end) arg_ptn+="(?!"+Syntax::IDENTIFIER_CHAR+")";
   return arg_ptn;
 }

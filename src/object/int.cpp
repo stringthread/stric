@@ -1,14 +1,14 @@
 #include "int.h"
 
-std::unordered_map<string, std::function<int(obj_ptr_t)>> IntUtil::cast_fn {
-  {"INT", [](obj_ptr_t obj){return std::static_pointer_cast<INT>(obj)->get_val();}},
+std::unordered_map<string, std::function<std::shared_ptr<ValueObject<int>>(obj_ptr_t)>> IntUtil::cast_fn {
+  {"INT", [](obj_ptr_t obj){return std::static_pointer_cast<INT>(obj);}},
 };
-int IntUtil::_obj2val_cast(obj_ptr_t obj) const {
-  if(!obj) return get_default();
-  if(obj->type()=="INT") return std::static_pointer_cast<INT>(obj)->get_val();
+std::shared_ptr<ValueObject<int>> IntUtil::obj_cast(obj_ptr_t obj) const {
+  if(!obj) return nullptr;
+  auto implicit_cast=std::static_pointer_cast<INT>(obj);
+  if(implicit_cast) return implicit_cast;
   if(cast_fn.count(obj->type())==0){
     throw std::runtime_error("Cast failed to INT : "+obj->type());
-    return 0;
   }
   return (cast_fn.at(obj->type()))(obj);
 }
@@ -38,6 +38,28 @@ op_func_map_t INT::op_func_def={
       })},
     }),
   },
+  {"PLUSPLUS",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {2,
+          [](std::vector<obj_ptr_t> v_obj){//suffix
+            int ret_val=util.obj2val_cast(v_obj[0]);
+            util.obj_cast(v_obj[0])->set(ret_val+1);
+            return factory->generate_from_val(ret_val);
+          }
+        },
+      })},
+      {0, op_func_map_1_t({
+        {2,
+          [](std::vector<obj_ptr_t> v_obj){//prefix
+            int ret_val=util.obj2val_cast(v_obj[1]);
+            util.obj_cast(v_obj[1])->set(ret_val+1);
+            return factory->generate_from_val(ret_val+1);
+          }
+        },
+      })},
+    }),
+  },
   {"MINUS",
     op_func_map_2_t({
       {1, op_func_map_1_t({
@@ -51,6 +73,28 @@ op_func_map_t INT::op_func_def={
         {2,
           [](std::vector<obj_ptr_t> v_obj){
             return factory->generate_from_val(-util.obj2val_cast(v_obj[1]));
+          }
+        },
+      })},
+    }),
+  },
+  {"MINUSMINUS",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {2,
+          [](std::vector<obj_ptr_t> v_obj){//suffix
+            int ret_val=util.obj2val_cast(v_obj[1]);
+            std::dynamic_pointer_cast<INT>(v_obj[1])->set(ret_val-1);
+            return factory->generate_from_val(ret_val);
+          }
+        },
+      })},
+      {0, op_func_map_1_t({
+        {2,
+          [](std::vector<obj_ptr_t> v_obj){//prefix
+            int ret_val=util.obj2val_cast(v_obj[1]);
+            std::dynamic_pointer_cast<INT>(v_obj[1])->set(ret_val-1);
+            return factory->generate_from_val(ret_val-1);
           }
         },
       })},

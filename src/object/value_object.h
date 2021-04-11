@@ -4,15 +4,18 @@
 #include <unordered_map>
 #include <functional>
 
+template<typename T>
+class ValueObject;
+
 //abstract
 template<typename T>
 class ValueObjectUtil{
 protected:
   virtual T get_default() const=0;
-  virtual T _obj2val_cast(obj_ptr_t) const=0;
 public:
+  virtual std::shared_ptr<ValueObject<T>> obj_cast(obj_ptr_t) const=0;
   virtual T obj2val_cast(obj_ptr_t obj) const{
-    return obj?_obj2val_cast(obj):get_default();
+    return obj?obj_cast(obj)->get_val():get_default();
   }
   virtual T val_cast(const string&) const=0;
   virtual string to_str(const T&) const=0;

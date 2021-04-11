@@ -16,6 +16,36 @@ obj_ptr_t OPERATORS::unary_plus(Executor *p_exec, const std::vector<AST_Node>& a
   }
   return (v_obj[1]->operators().at("PLUS").at(0).at(2))(v_obj);
 }
+obj_ptr_t OPERATORS::unary_minus(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=2){
+    throw std::invalid_argument("wrong length arguments for unary_plus");
+  }
+  std::vector<obj_ptr_t> v_obj;
+  for(const auto &elem : args){
+    v_obj.push_back(p_exec->eval(elem));
+  }
+  return (v_obj[1]->operators().at("MINUS").at(0).at(2))(v_obj);
+}
+obj_ptr_t OPERATORS::prefix_increment(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=2){
+    throw std::invalid_argument("wrong length arguments for prefix_increment");
+  }
+  std::vector<obj_ptr_t> v_obj;
+  for(const auto &elem : args){
+    v_obj.push_back(p_exec->eval(elem));
+  }
+  return (v_obj[1]->operators().at("PLUSPLUS").at(0).at(2))(v_obj);
+}
+obj_ptr_t OPERATORS::prefix_decrement(Executor *p_exec, const std::vector<AST_Node>& args){
+  if(args.size()!=2){
+    throw std::invalid_argument("wrong length arguments for prefix_decrement");
+  }
+  std::vector<obj_ptr_t> v_obj;
+  for(const auto &elem : args){
+    v_obj.push_back(p_exec->eval(elem));
+  }
+  return (v_obj[1]->operators().at("MINUSMINUS").at(0).at(2))(v_obj);
+}
 obj_ptr_t OPERATORS::_not(Executor *p_exec, const std::vector<AST_Node>& args){
   if(args.size()!=2){
     throw std::invalid_argument("wrong length arguments for not");

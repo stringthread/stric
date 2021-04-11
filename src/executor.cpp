@@ -22,6 +22,9 @@ std::unordered_set<string> Executor::operator_terminals{
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
+  {"MINUS", OPERATORS::unary_minus},
+  {"PLUSPLUS", OPERATORS::prefix_increment},
+  {"MINUSMINUS", OPERATORS::prefix_decrement},
   {"NOT", OPERATORS::_not},
   {"LEFT_PAREN", OPERATORS::left_paren},
   {"IF", CONTROLS::_if},
@@ -70,7 +73,7 @@ obj_ptr_t Executor::eval(const AST_Node &node){
   else{
     switch(node.children.size()){
       case 0:
-        if(node.type=="IDENTIFIER") return get_var(node.value);
+        //if(node.type=="IDENTIFIER") return get_var(node.value);
         return Object::factories.at(node.type)->generate(node.value);
       case 1:
         return eval(node.children[0]);
@@ -101,12 +104,10 @@ void Executor::add_exec(const string &token, exec_func_t func){
   control_exec[token]=func;
 }
 obj_ptr_t Executor::get_var(const string &name){
-  try{
-    return vars.at(name);
-  }catch(std::out_of_range){
-    std::cout << "Getting undefined identifier : " << name << '\n';
-    throw;
+  if(vars.count(name)==0){
+    throw std::invalid_argument("Getting undefined identifier : " + name);
   }
+  return vars.at(name);
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name, obj_ptr_t value){
   if(Object::factories.count(type)==0){

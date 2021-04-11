@@ -1,14 +1,14 @@
 #include "bool.h"
 
-std::unordered_map<string, std::function<bool(obj_ptr_t)>> BoolUtil::cast_fn {
-  {"BOOL", [](obj_ptr_t obj){return std::static_pointer_cast<BOOL>(obj)->get_val();}},
+std::unordered_map<string, std::function<std::shared_ptr<ValueObject<bool>>(obj_ptr_t)>> BoolUtil::cast_fn {
+  {"BOOL", [](obj_ptr_t obj){return std::static_pointer_cast<BOOL>(obj);}},
 };
-bool BoolUtil::_obj2val_cast(obj_ptr_t obj) const {
-  if(!obj) return get_default();
-  if(obj->type()=="BOOL") return std::static_pointer_cast<BOOL>(obj)->get_val();
+std::shared_ptr<ValueObject<bool>> BoolUtil::obj_cast(obj_ptr_t obj) const {
+  if(!obj) return nullptr;
+  auto implicit_cast=std::static_pointer_cast<BOOL>(obj);
+  if(implicit_cast) return implicit_cast;
   if(cast_fn.count(obj->type())==0){
     throw std::runtime_error("Cast failed to BOOL : "+obj->type());
-    return 0;
   }
   return (cast_fn.at(obj->type()))(obj);
 }
@@ -36,7 +36,7 @@ op_func_map_t BOOL::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate_from_val(std::dynamic_pointer_cast<BOOL>(v_obj[0])->get_val()&&std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()&&std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
           }
         },
       })},
@@ -47,7 +47,7 @@ op_func_map_t BOOL::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate_from_val(std::dynamic_pointer_cast<BOOL>(v_obj[0])->get_val()||std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()||std::dynamic_pointer_cast<BOOL>(v_obj[2])->get_val());
           }
         },
       })},

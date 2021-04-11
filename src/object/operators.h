@@ -26,6 +26,9 @@ public:
   }
   static void init();
   static obj_ptr_t unary_plus(Executor *p_exec, const std::vector<AST_Node>& args);
+  static obj_ptr_t unary_minus(Executor *p_exec, const std::vector<AST_Node>& args);
+  static obj_ptr_t prefix_increment(Executor *p_exec, const std::vector<AST_Node>& args);
+  static obj_ptr_t prefix_decrement(Executor *p_exec, const std::vector<AST_Node>& args);
   static obj_ptr_t _not(Executor *p_exec, const std::vector<AST_Node>& args);
   static obj_ptr_t left_paren(Executor *p_exec, const std::vector<AST_Node>& args);
   static obj_ptr_t assign(Executor *p_exec, const std::vector<AST_Node>& args);
