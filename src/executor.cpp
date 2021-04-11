@@ -10,8 +10,9 @@ std::unordered_set<string> Executor::operator_symbols {
   "prefix_unary_operator",
   "math_operator_1",
   "math_operator_2",
-  "assign_operator",
+  "compare_operator",
   "bool_operator",
+  "assign_operator",
 };
 std::unordered_set<string> Executor::operator_terminals{
   "PLUSPLUS", "PLUS", "MINUSMINUS", "MINUS", "ASTERISK", "DIV_INT", "SLASH",
@@ -31,6 +32,7 @@ std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"ELSE", CONTROLS::_if_else},
   {"ASSIGN", OPERATORS::assign},
   {"DOT", CONTROLS::dot},
+  {"WHILE", CONTROLS::_while},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);

@@ -39,4 +39,14 @@ namespace CONTROLS{
       throw std::invalid_argument(string("@CONTROLS::dot : ")+e.what());
     }
   }
+  obj_ptr_t _while(Executor *p_exec, const std::vector<AST_Node>& args){
+    if(args.size()!=3){
+      throw std::invalid_argument("wrong length arguments for if");
+    }
+    BoolUtil bool_util;
+    while(bool_util.obj2val_cast(p_exec->eval(args[1]))){
+      p_exec->eval(args[2]);
+    }
+    return nullptr;
+  }
 }

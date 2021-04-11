@@ -15,11 +15,11 @@ public:
 class INT : public ValueObject<int>{
 private:
   INT(int val) : ValueObject<int>(val,util){}
-  static IntUtil util;
-  static std::shared_ptr<ValueObjectFactory<INT, int>> factory;
   static op_func_map_t op_func_def;
 public:
   friend ValueObjectFactory<INT, int>;
+  static IntUtil util;
+  static std::shared_ptr<ValueObjectFactory<INT, int>> factory;
   string type() const override{ return "INT"; }
   op_func_map_t& operators() const override {
     return op_func_def;

@@ -15,11 +15,11 @@ public:
 class BOOL : public ValueObject<bool>{
 private:
   BOOL(bool val) : ValueObject<bool>(val, util){}
-  static BoolUtil util;
-  static std::shared_ptr<ValueObjectFactory<BOOL, bool>> factory;
   static op_func_map_t op_func_def;
 public:
   friend ValueObjectFactory<BOOL, bool>;
+  static BoolUtil util;
+  static std::shared_ptr<ValueObjectFactory<BOOL, bool>> factory;
   string type() const override{ return "BOOL"; }
   op_func_map_t& operators() const override { return op_func_def; }
   string print() const override { return val?"@t":"@f"; }

@@ -1,4 +1,5 @@
 #include "int.h"
+#include "bool.h"
 
 std::unordered_map<string, std::function<std::shared_ptr<ValueObject<int>>(obj_ptr_t)>> IntUtil::cast_fn {
   {"INT", [](obj_ptr_t obj){return std::static_pointer_cast<INT>(obj);}},
@@ -25,7 +26,7 @@ op_func_map_t INT::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()+std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()+util.obj_cast(v_obj[2])->get_val());
           }
         },
       })},
@@ -65,7 +66,7 @@ op_func_map_t INT::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()-std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()-util.obj_cast(v_obj[2])->get_val());
           }
         },
       })},
@@ -84,7 +85,7 @@ op_func_map_t INT::op_func_def={
         {2,
           [](std::vector<obj_ptr_t> v_obj){//suffix
             int ret_val=util.obj2val_cast(v_obj[1]);
-            std::dynamic_pointer_cast<INT>(v_obj[1])->set(ret_val-1);
+            util.obj_cast(v_obj[1])->set(ret_val-1);
             return factory->generate_from_val(ret_val);
           }
         },
@@ -93,7 +94,7 @@ op_func_map_t INT::op_func_def={
         {2,
           [](std::vector<obj_ptr_t> v_obj){//prefix
             int ret_val=util.obj2val_cast(v_obj[1]);
-            std::dynamic_pointer_cast<INT>(v_obj[1])->set(ret_val-1);
+            util.obj_cast(v_obj[1])->set(ret_val-1);
             return factory->generate_from_val(ret_val-1);
           }
         },
@@ -105,7 +106,7 @@ op_func_map_t INT::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()*std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()*util.obj_cast(v_obj[2])->get_val());
           }
         },
       })},
@@ -116,7 +117,73 @@ op_func_map_t INT::op_func_def={
       {1, op_func_map_1_t({
         {3,
           [](std::vector<obj_ptr_t> v_obj){
-            return factory->generate(std::to_string(std::dynamic_pointer_cast<INT>(v_obj[0])->get_val()/std::dynamic_pointer_cast<INT>(v_obj[2])->get_val()));
+            return factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()/util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"EQUAL",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()==util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"NOT_EQUAL",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()!=util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"LEFT_ANGLE_BRACKET",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()<util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"RIGHT_ANGLE_BRACKET",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()>util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"LESS_EQUAL",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()<=util.obj_cast(v_obj[2])->get_val());
+          }
+        },
+      })},
+    }),
+  },
+  {"GREATER_EQUAL",
+    op_func_map_2_t({
+      {1, op_func_map_1_t({
+        {3,
+          [](std::vector<obj_ptr_t> v_obj){
+            return BOOL::factory->generate_from_val(util.obj_cast(v_obj[0])->get_val()>=util.obj_cast(v_obj[2])->get_val());
           }
         },
       })},
