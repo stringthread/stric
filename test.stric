@@ -1,4 +1,12 @@
 INT a;
+INT b;
 while(.a<3){
   .a++;
+  while(.b<2){
+    .b++;
+    break;
+    @f;
+  }
+  @t;
 }
+.a;

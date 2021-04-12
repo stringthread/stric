@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
       return -1;
     }
     code=string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+    ifs.close();
   }
   Parser parser=Parser::create();
   AST_Node result=parser.parse(code);

@@ -33,6 +33,9 @@ std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"ASSIGN", OPERATORS::assign},
   {"DOT", CONTROLS::dot},
   {"WHILE", CONTROLS::_while},
+  {"RETURN", CONTROLS::_return},
+  {"BREAK", CONTROLS::_break},
+  {"CONTINUE", CONTROLS::_continue},
 };
 const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
@@ -43,22 +46,35 @@ Executor::Executor(){
 }
 obj_ptr_t Executor::eval(const AST_Node &node){
   if(node.type=="main"){
+    obj_ptr_t result;
     for(const auto &block : node.children){
-      eval(block);
+      result=eval(block);
+      if(result&&(CONTROLS::stoppings.count(result->type())!=0||result->type()=="CONTINUE")) return result;
     }
+    return result;
   }
   else if(node.type=="block"){
+    obj_ptr_t result;
     for(const auto &sentence : node.children){
-      eval(sentence);
+      result=eval(sentence);
+      if(result&&(CONTROLS::stoppings.count(result->type())!=0||result->type()=="CONTINUE")) return result;
     }
+    return result;
   }
   else if(node.type=="sentence"){
+    obj_ptr_t result, tmp;
     for(int i=0;i<node.children.size();i++){
-      const auto result=eval(node.children[i]);
-      if(result) std::cout << result->print() << std::endl;
+      tmp=eval(node.children[i]);
+      if(tmp){
+        std::cout << tmp->print() << std::endl;
+        if(CONTROLS::stoppings.count(tmp->type())!=0||tmp->type()=="CONTINUE") return tmp;
+      }
+      result=tmp;
     }
+    return result;
   }
   else if(node.type=="EOS"){
+    return nullptr;
   }
   else if(node.type=="var_def"){
     if(node.children.size()!=2){
@@ -100,7 +116,6 @@ obj_ptr_t Executor::eval(const AST_Node &node){
         return (control_exec.at(type_control))(this, node.children);
     }
   }
-  return nullptr;
 }
 void Executor::add_exec(const string &token, exec_func_t func){
   control_exec[token]=func;

@@ -3,6 +3,7 @@
 #include "object.h"
 #include <unordered_map>
 #include <functional>
+#include <type_traits>
 
 template<typename T>
 class ValueObject;
@@ -15,7 +16,8 @@ protected:
 public:
   virtual std::shared_ptr<ValueObject<T>> obj_cast(obj_ptr_t) const=0;
   virtual T obj2val_cast(obj_ptr_t obj) const{
-    return obj?obj_cast(obj)->get_val():get_default();
+    std::shared_ptr<ValueObject<T>> out=obj_cast(obj);
+    return out?out->get_val():get_default();
   }
   virtual T val_cast(const string&) const=0;
   virtual string to_str(const T&) const=0;
@@ -35,7 +37,8 @@ protected:
 public:
   virtual string type() const override{ return "ValueObject"; };//should be overriden
   virtual void set(obj_ptr_t new_val) override { val=util.obj2val_cast(new_val); }
-  virtual void set(T new_val) { val=new_val; }
+  template<typename std::enable_if<!(std::is_same<T, obj_ptr_t>::value)>* =nullptr>//prevent overload failure when T=obj_ptr_t
+  void set(T new_val) { val=new_val; }//custom with operator=() overload
   T get_val() const { return val; }
   //op_func_map_t& Derived::operators() const override { return op_func_def; }
   //string Derived::print() const override;
