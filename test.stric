@@ -1,8 +1,2 @@
-INT a=1;
-if(@t){
-  INT b=2;
-  .a;
-  .b;
-}
+INT a=2;
 .a;
-.b;

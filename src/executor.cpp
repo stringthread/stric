@@ -17,9 +17,8 @@ std::unordered_set<string> Executor::operator_symbols {
 std::unordered_set<string> Executor::operator_terminals{
   "PLUSPLUS", "PLUS", "MINUSMINUS", "MINUS", "ASTERISK", "DIV_INT", "SLASH",
   "ANDAND", "AND", "OROR", "OR", "HAT", "NOT", "EQUAL", "NOT_EQUAL",
-  "LESS_EQUAL", "GREATER_EQUAL", "LEFT_ANGLE_BRACKET", "RIGHT_ANGLE_BRACKET",
-  "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
-  "LEFT_BRACKET", "RIGHT_BRACKET",
+  "LESS_EQUAL", "GREATER_EQUAL", "LEFT_ANGLE_BRACKET", "LEFT_PAREN",
+  "LEFT_BRACE", "LEFT_BRACKET",
 };
 std::unordered_map<string, exec_func_t> Executor::control_exec{
   {"PLUS", OPERATORS::unary_plus},
@@ -75,13 +74,21 @@ obj_ptr_t Executor::eval(const AST_Node &node){
   else if(node.type=="EOS"){
     return nullptr;
   }
-  else if(node.type=="var_def"){
-    if(node.children.size()!=2){
-      throw std::runtime_error("invalid children size : var_def");
-      return nullptr;
+  else if(node.type=="def_statement"){
+    obj_ptr_t var;
+    switch(node.children.size()){
+      case 2:
+        var=def_var(node.children[0].children[0].value, node.children[0].children[1].value);//only for simple type
+        if(!var) std::cout << "null after def_var" << '\n';
+        break;
+      case 4:
+        var=def_var(node.children[0].children[0].value, node.children[0].children[1].value, eval(node.children[2]));//only for simple type
+        if(!var) std::cout << "null after def_var" << '\n';
+        break;
+      default:
+        throw std::runtime_error("invalid children size : var_def");
+        return nullptr;
     }
-    auto var=def_var(node.children[0].value, node.children[1].value);//only for simple type
-    if(!var) std::cout << "null after def_var" << '\n';
     return var;
   }
   else if(operator_terminals.count(node.type)!=0){
@@ -120,7 +127,6 @@ void Executor::add_exec(const string &token, exec_func_t func){
   control_exec[token]=func;
 }
 obj_ptr_t Executor::get_var(const string &name, bool flg_err){
-  std::cout << "get_var:"<<std::to_string(vars.size()) << '\n';
   if(vars.count(name)!=0) return vars.at(name);
   if(parent){
     auto val=parent->get_var(name,false);
