@@ -50,8 +50,10 @@ const std::vector<LexDef> Syntax::tokens {
 };
 const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"main", std::vector<string>({"main","block"})},
+  {"main", std::vector<string>({"main","sentence"})},
   {"main", std::vector<string>({"block"})},
-  {"block", std::vector<string>({"sentence"})},
+  {"main", std::vector<string>({"sentence"})},
+  //{"block", std::vector<string>({"sentence"})},
   {"block", std::vector<string>({"LEFT_BRACE","main","RIGHT_BRACE"})},
   {"sentence", std::vector<string>({"value_expr","EOS"})},
   {"sentence", std::vector<string>({"if_statement"})},
@@ -61,8 +63,11 @@ const std::vector<SyntaxDef> Syntax::syntax_rules {
   {"sentence", std::vector<string>({"break_statement"})},
   {"sentence", std::vector<string>({"continue_statement"})},
   {"if_statement", std::vector<string>({"IF","atom_value","block"})},
+  {"if_statement", std::vector<string>({"IF","atom_value","sentence"})},
   {"if_else_statement", std::vector<string>({"if_statement","ELSE","block"})},
+  {"if_else_statement", std::vector<string>({"if_statement","ELSE","sentence"})},
   {"while_statement", std::vector<string>({"WHILE","atom_value","block"})},
+  {"while_statement", std::vector<string>({"WHILE","atom_value","sentence"})},
   {"return_statement", std::vector<string>({"RETURN","EOS"})},
   {"return_statement", std::vector<string>({"RETURN","value_expr","EOS"})},
   {"break_statement", std::vector<string>({"BREAK","EOS"})},
