@@ -1,12 +1,8 @@
-INT a;
-INT b;
-while(.a<3){
-  .a++;
-  while(.b<2){
-    .b++;
-    break;
-    @f;
-  }
-  @t;
+INT a=1;
+if(@t){
+  INT b=2;
+  .a;
+  .b;
 }
 .a;
+.b;

@@ -22,12 +22,16 @@ private:
   static std::unordered_set<string> operator_terminals; //terminals
   static std::unordered_map<string, exec_func_t> control_exec; //ControlTokenName->function
   static const string& get_tokenname_from_AST(const AST_Node &node);
+  Executor *parent=nullptr;
   std::unordered_map<string, obj_ptr_t> vars;
   void init();
 public:
   Executor();
+  Executor(Executor *p):Executor(){
+    parent=p;
+  }
   obj_ptr_t eval(const AST_Node &node);
   void add_exec(const string &token, exec_func_t func);
-  obj_ptr_t get_var(const string &name);
+  obj_ptr_t get_var(const string &name, bool flg_err=true);
   obj_ptr_t def_var(const string &type, const string &name, obj_ptr_t value=nullptr);
 };

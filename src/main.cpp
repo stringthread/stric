@@ -5,6 +5,7 @@
 #include "parser/parser.h"
 #include "parser/syntax.h"
 #include "executor.h"
+#include "object/object.h"
 
 using std::string;
 
@@ -24,6 +25,7 @@ int main(int argc, char *argv[]){
   Parser parser=Parser::create();
   AST_Node result=parser.parse(code);
   Executor exec;
+  Object::init();
   exec.eval(result);
   return 0;
 }

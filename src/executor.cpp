@@ -41,9 +41,7 @@ const string& Executor::get_tokenname_from_AST(const AST_Node &node){
   if(node.children.size()==1) return get_tokenname_from_AST(node.children[0]);
   return node.type;
 }
-Executor::Executor(){
-  Object::init();
-}
+Executor::Executor(){}
 obj_ptr_t Executor::eval(const AST_Node &node){
   if(node.type=="main"){
     obj_ptr_t result;
@@ -55,8 +53,9 @@ obj_ptr_t Executor::eval(const AST_Node &node){
   }
   else if(node.type=="block"){
     obj_ptr_t result;
+    Executor child_exec=Executor(this);
     for(const auto &sentence : node.children){
-      result=eval(sentence);
+      result=child_exec.eval(sentence);
       if(result&&(CONTROLS::stoppings.count(result->type())!=0||result->type()=="CONTINUE")) return result;
     }
     return result;
@@ -120,11 +119,15 @@ obj_ptr_t Executor::eval(const AST_Node &node){
 void Executor::add_exec(const string &token, exec_func_t func){
   control_exec[token]=func;
 }
-obj_ptr_t Executor::get_var(const string &name){
-  if(vars.count(name)==0){
-    throw std::invalid_argument("Getting undefined identifier : " + name);
+obj_ptr_t Executor::get_var(const string &name, bool flg_err){
+  std::cout << "get_var:"<<std::to_string(vars.size()) << '\n';
+  if(vars.count(name)!=0) return vars.at(name);
+  if(parent){
+    auto val=parent->get_var(name,false);
+    if(val) return val;
   }
-  return vars.at(name);
+  if(flg_err)throw std::invalid_argument("Getting undefined identifier : " + name); // throw only in called level
+  return nullptr;
 }
 obj_ptr_t Executor::def_var(const string &type, const string &name, obj_ptr_t value){
   if(Object::factories.count(type)==0){

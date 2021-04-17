@@ -41,7 +41,7 @@ namespace CONTROLS{
     }
     try{
       return p_exec->get_var(args[1].value);
-    }catch(std::out_of_range &e){
+    }catch(std::invalid_argument &e){
       throw std::invalid_argument(string("@CONTROLS::dot : ")+e.what());
     }
   }
